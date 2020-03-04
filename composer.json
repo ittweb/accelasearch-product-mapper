@@ -1,0 +1,21 @@
+{
+    "name": "ittweb/accelasearch/product-mapper",
+    "description": "Allows easy integration with AccelaSearch's product managerment.",
+    "type": "library",    
+    "version": "1.0.0",
+    "authors": [{
+        "name": "Marco Zanella",
+        "email": "mzanella@ittweb.net"
+    }],
+    "license": [
+        "MIT"
+    ],
+    "require": {
+      "php": "~7.1.3||~7.2.0||~7.3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ittweb\\AccelaSearch\\": "src"
+        }
+    }
+}
