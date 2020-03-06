@@ -4,6 +4,8 @@
  */
 namespace Ittweb\AccelaSearch;
 
+require_once __DIR__ . '/AccelaSearchException.php';
+
 /**
  * Products Data Mapper for AccelaSearch.
  */
@@ -31,6 +33,7 @@ class ProductsMapper
      * @param int|null $shop_identifier Shop identifier provided by
      *                                 AccelaSearch; if seet to null or
      *                                 omitted, any shop will be used
+     * @throws AccelaSearchException
      */
     public function __construct(string $api_key, string $identifier_field_name, int $shop_identifier = null) {
         $this->api_key = $api_key;
@@ -39,9 +42,12 @@ class ProductsMapper
         // If no shop identifier was provided, a random one is chosen
         if (is_null($shop_identifier)) {
             $shops = $this->api('/shops');
-            $shop_identifier = !empty($shops) ? $shops[0]['id'] : 0;
+            if (empty($shops)) {
+                throw new AccelaSearchException("No shops for this customer.", 0);
+            }
+            $shop_identifier = $shops[0]['id'];
         }
-        $this->shop_identifier = 'shop_' . $shop_identifier;
+        $this->shop_identifier = $shop_identifier;
 
         // Connects to collector
         $collector = $this->getCollector();
@@ -67,17 +73,59 @@ class ProductsMapper
      * Performs an API call.
      *
      * @param string $endpoint Endpoint to call
+     * @param string $method Request method, default GET
      * @return array Response of API
+     * @throws AccelaSearchException In case of API error
      */
-    protected function api(string $endpoint): array {
+    protected function api(string $endpoint, string $method = 'GET'): array {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, 'https://accelasearch.dev1.accelasearch.net/API' . $endpoint);
+        curl_setopt($ch, CURLOPT_POST, $method === 'POST');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'X-AccelaSearch-apikey: ' . $this->api_key
         ]);
+        $response = curl_exec($ch);
 
-        return json_decode(curl_exec($ch), true);
+        if (curl_errno($ch)) {
+            throw new AccelaSearchException(curl_error($ch));
+        }
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        if ($http_code !== 200) {
+            throw new AccelaSearchException('HTTP error, endopoint replied with code ' . $http_code);
+        }
+        curl_close($ch);
+
+        $data = json_decode($response, true);
+        if (array_key_exists('error', $data)) {
+            throw new AccelaSearchException($data['error'], 0);
+        }
+
+        return $data;
+    }
+
+
+    /**
+     * Acquires lock to insert/update/delete product information.
+     *
+     * @return self This mapper
+     */
+    public function lock(): self {
+        $this->api('/shops/' . $this->shop_identifier . '/synchronization/start', 'POST');
+
+        return $this;
+    }
+
+
+    /**
+     * Releases lock to insert/update/delete product information.
+     *
+     * @return self This mapper
+     */
+    public function unlock(): self {
+        $this->api('/shops/' . $this->shop_identifier . '/synchronization/end', 'POST');
+
+        return $this;
     }
 
 
@@ -88,6 +136,16 @@ class ProductsMapper
      */
     public function getCollector(): array {
         return $this->api('/collector');
+    }
+
+
+    /**
+     * Returns selected shop of customer.
+     *
+     * @return array Shop information
+     */
+    public function getShop(): array {
+        return $this->api('/shops/' . $this->shop_identifier);
     }
 
 
