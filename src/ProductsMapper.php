@@ -1,6 +1,8 @@
 <?php
 /**
  * Products Data Mapper for AccelaSearch.
+ *
+ * Facilitates integration with AccelaSearch
  */
 namespace Ittweb\AccelaSearch;
 
