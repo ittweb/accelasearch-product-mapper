@@ -150,19 +150,24 @@ class ProductsMapper
     }
 
 
-    protected function insertTypedAttributes(array $attributes, int $product_id, string $type): self {
+    protected function insertTypedAttributes(array $attributes, int $product_id, string $type): self
+    {
         if (!empty($attributes)) {
-            $query = 'INSERT INTO attribute_' . $type . '(product_id, name, value) VALUES (?, ?, ?)'
-                   . str_repeat(', (?, ?, ?)', count($attributes) - 1);
-            $sth = $this->dbh->prepare($query);
-            $values = [];
+            $values              = [];
+            $countBoundVariables = count($attributes) - 1;
             foreach ($attributes as $attribute) {
                 if (!is_null($attribute['value']) && $attribute['value'] !== '') {
                     $values[] = $product_id;
                     $values[] = $attribute['name'];
                     $values[] = $attribute['value'];
+                } else {
+                    $countBoundVariables--;
                 }
             }
+            $query = 'INSERT INTO attribute_'.$type.'(product_id, name, value) VALUES (?, ?, ?)'
+                .str_repeat(', (?, ?, ?)', $countBoundVariables);
+            $sth   = $this->dbh->prepare($query);
+
             $sth->execute($values);
         }
 
