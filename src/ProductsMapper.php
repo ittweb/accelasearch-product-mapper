@@ -6,8 +6,6 @@
  */
 namespace Ittweb\AccelaSearch;
 
-require_once __DIR__ . '/AccelaSearchException.php';
-
 /**
  * Products Data Mapper for AccelaSearch.
  */
@@ -159,9 +157,11 @@ class ProductsMapper
             $sth = $this->dbh->prepare($query);
             $values = [];
             foreach ($attributes as $attribute) {
-                $values[] = $product_id;
-                $values[] = $attribute['name'];
-                $values[] = $attribute['value'];
+                if (!is_null($attribute['value']) && $attribute['value'] !== '') {
+                    $values[] = $product_id;
+                    $values[] = $attribute['name'];
+                    $values[] = $attribute['value'];
+                }
             }
             $sth->execute($values);
         }
