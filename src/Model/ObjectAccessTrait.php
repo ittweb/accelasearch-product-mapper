@@ -1,6 +1,6 @@
 <?php
 namespace Ittweb\AccelaSearch\ProductMapper\Model;
-use \OutOfBoundException;
+use \OutOfBoundsException;
 
 trait ObjectAccessTrait {
     private $data = [];

@@ -8,4 +8,8 @@ trait SellableTrait {
     public function getPrice(): Price {
         return $this->price;
     }
+
+    public function setPrice(Price $price) {
+        $this->price = $price;
+    }
 }

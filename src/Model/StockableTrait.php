@@ -8,4 +8,8 @@ trait StockableTrait {
     public function getStock(): Stock {
         return $this->stock;
     }
+
+    public function setStock(Stock $stock) {
+        $this->stock = $stock;
+    }
 }
