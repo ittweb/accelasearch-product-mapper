@@ -8,6 +8,7 @@
  * @package    accelasearch-product-mapper
  */
 namespace Ittweb\AccelaSearch\Model;
+use \OutOfBoundsException;
 
 /**
  * A generic entity
@@ -56,7 +57,7 @@ abstract class Entity implements \ArrayAccess {
      */
     public function offsetGet($offset) {
         if (!array_key_exists($offset, $this->data)) {
-            throw new \OutOfBoundsException("Attribute \"$offset\" is not defined.");
+            throw new OutOfBoundsException("Attribute \"$offset\" is not defined.");
         }
 
         return $this->data[$offset];
