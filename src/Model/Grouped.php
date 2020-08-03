@@ -3,7 +3,7 @@ namespace Ittweb\AccelaSearch\ProductMapper\Model;
 use \Ittweb\AccelaSearch\ProductMapper\Model\Stock\StockInfo as Stock;
 use \Ittweb\AccelaSearch\ProductMapper\Model\Price\MultiGroupPrice as Price;
 
-class Bundle implements ProductInterface {
+class Grouped implements ProductInterface {
     use ProductTrait;
 
     private $components;
@@ -21,11 +21,11 @@ class Bundle implements ProductInterface {
         }
         return [
             'header' => [
-                'type' => 'bundle'
+                'type' => 'grouped'
             ],
             'data' => $this->getAttributesAsDictionary(),
             'configurable_attributes' => $this->getConfigurableAttributesAsArray(),
-            'bundles' => $components,
+            'Groupeds' => $components,
             'warehouses' => $this->getStock()->asArray(),
             'pricing' => $this->getPrice()->asArray()
         ];
@@ -40,6 +40,6 @@ class Bundle implements ProductInterface {
     }
 
     public function accept(ItemVisitorInterface $visitor) {
-        $visitor->visitBundle($this);
+        $visitor->visitGrouped($this);
     }
 }
