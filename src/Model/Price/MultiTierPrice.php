@@ -1,11 +1,23 @@
 <?php
 namespace Ittweb\AccelaSearch\ProductMapper\Model\Price;
+use \JsonSerializable;
+use \Ittweb\AccelaSearch\ProductMapper\Model\ArrayConvertibleInterface;
+use \Ittweb\AccelaSearch\ProductMapper\Model\ArrayToJsonTrait;
 
-class MultiTierPrice {
+class MultiTierPrice implements ArrayConvertibleInterface, JsonSerializable {
+    use ArrayToJsonTrait;
     private $tiers;
 
     public function __construct() {
         $this->tiers = [];
+    }
+
+    public function asArray(): array {
+        $tiers = [];
+        foreach ($this->tiers as $quantity => $tier) {
+            $tiers[$quantity] = $tier->asArray();
+        }
+        return $tiers;
     }
 
     public function asDictionary(): array {

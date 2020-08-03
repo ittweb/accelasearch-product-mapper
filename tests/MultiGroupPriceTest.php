@@ -3,24 +3,29 @@ use PHPUnit\Framework\TestCase;
 use \Ittweb\AccelaSearch\ProductMapper\Model\Price\Price;
 use \Ittweb\AccelaSearch\ProductMapper\Model\Price\MultiCurrencyPrice;
 use \Ittweb\AccelaSearch\ProductMapper\Model\Price\MultiTierPrice;
+use \Ittweb\AccelaSearch\ProductMapper\Model\Price\MultiGroupPrice;
 
-final class MultiTierPriceTest extends TestCase {
-    public function testGetPricesAsDictionary() {
+final class MultiGroupPriceTest extends TestCase {
+    public function testAsDictionary() {
         $price_eur = new Price(10.0);
         $price_tier = new MultiCurrencyPrice();
         $price_tier->add('eur', $price_eur);
-        $price = new MultiTierPrice();
-        $price->add(0.0, $price_tier);
-        $this->assertEquals(['0' => $price_tier], $price->asDictionary());
+        $price_group = new MultiTierPrice();
+        $price_group->add(0.0, $price_tier);
+        $price = new MultiGroupPrice();
+        $price->add('group_id', $price_group);
+        $this->assertEquals(['group_id' => $price_group], $price->asDictionary());
     }
 
     public function testAdd() {
         $price_eur = new Price(10.0);
         $price_tier = new MultiCurrencyPrice();
         $price_tier->add('eur', $price_eur);
-        $price = new MultiTierPrice();
+        $price_group = new MultiTierPrice();
+        $price_group->add(0.0, $price_tier);
+        $price = new MultiGroupPrice();
         $size = count($price->asDictionary());
-        $price->add(0.0, $price_tier);
+        $price->add('group_id', $price_group);
         $this->assertEquals($size + 1, count($price->asDictionary()));
     }
 
@@ -28,10 +33,12 @@ final class MultiTierPriceTest extends TestCase {
         $price_eur = new Price(10.0);
         $price_tier = new MultiCurrencyPrice();
         $price_tier->add('eur', $price_eur);
-        $price = new MultiTierPrice();
-        $price->add(0.0, $price_tier);
+        $price_group = new MultiTierPrice();
+        $price_group->add(0.0, $price_tier);
+        $price = new MultiGroupPrice();
+        $price->add('group_id', $price_group);
         $size = count($price->asDictionary());
-        $price->remove(0.0);
+        $price->remove('group_id');
         $this->assertEquals($size - 1, count($price->asDictionary()));
     }
 
@@ -39,8 +46,10 @@ final class MultiTierPriceTest extends TestCase {
         $price_eur = new Price(10.0);
         $price_tier = new MultiCurrencyPrice();
         $price_tier->add('eur', $price_eur);
-        $price = new MultiTierPrice();
-        $price->add(0.0, $price_tier);
-        $this->assertEquals(['0' => ['EUR' => ['listing_price' => 10.0, 'selling_price' => 10.0]]], $price->asArray());
+        $price_group = new MultiTierPrice();
+        $price_group->add(0.0, $price_tier);
+        $price = new MultiGroupPrice();
+        $price->add('group_id', $price_group);
+        $this->assertEquals(['group_id' => ['0' => ['EUR' => ['listing_price' => 10.0, 'selling_price' => 10.0]]]], $price->asArray());
     }
 }

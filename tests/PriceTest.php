@@ -18,4 +18,10 @@ final class PriceTest extends TestCase {
         $price->setSellingPrice(5.0);
         $this->assertEquals(5.0, $price->getSellingPrice());
     }
+
+    public function testAsArray() {
+        $price = new Price(10.0);
+        $price->setSellingPrice(5.0);
+        $this->assertEquals(['listing_price' => 10.0, 'selling_price' => 5.0], $price->asArray());
+    }
 }

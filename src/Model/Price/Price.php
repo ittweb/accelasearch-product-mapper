@@ -1,7 +1,11 @@
 <?php
 namespace Ittweb\AccelaSearch\ProductMapper\Model\Price;
+use \JsonSerializable;
+use \Ittweb\AccelaSearch\ProductMapper\Model\ArrayConvertibleInterface;
+use \Ittweb\AccelaSearch\ProductMapper\Model\ArrayToJsonTrait;
 
-class Price {
+class Price implements JsonSerializable, ArrayConvertibleInterface {
+    use ArrayToJsonTrait;
     private $listing_price;
     private $selling_price;
 
@@ -16,6 +20,13 @@ class Price {
 
     public function getSellingPrice(): float {
         return $this->selling_price;
+    }
+
+    public function asArray(): array {
+        return [
+            'listing_price' => $this->listing_price,
+            'selling_price' => $this->selling_price
+        ];
     }
 
     public function setSellingPrice(float $selling_price) {

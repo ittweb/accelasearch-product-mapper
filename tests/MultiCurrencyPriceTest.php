@@ -29,4 +29,11 @@ final class MultiCurrencyPriceTest extends TestCase {
         $price->remove('eur');
         $this->assertEquals($size - 1, count($price->asDictionary()));
     }
+
+    public function testAsArray() {
+        $price_eur = new Price(10.0);
+        $price = new MultiCurrencyPrice();
+        $price->add('eur', $price_eur);
+        $this->assertEquals(['EUR' => ['listing_price' => 10.0, 'selling_price' => 10.0]], $price->asArray());
+    }
 }
