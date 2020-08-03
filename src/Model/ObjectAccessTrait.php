@@ -1,9 +1,9 @@
 <?php
-namespace Ittweb\AccelaSearch\Model;
+namespace Ittweb\AccelaSearch\ProductMapper\Model;
 use \OutOfBoundException;
 
 trait ObjectAccessTrait {
-    private $data;
+    private $data = [];
 
     public function __isset(string $name): bool {
         return array_key_exists($name, $this->data);

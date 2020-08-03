@@ -1,9 +1,9 @@
 <?php
-namespace Ittweb\AccelaSearch\Model;
+namespace Ittweb\AccelaSearch\ProductMapper\Model;
 use \OutOfBoundException;
 
 trait ArrayAccessTrait {
-    private $data;
+    private $data = [];
 
     public function offsetExists($name): bool {
         return array_key_exists($name, $this->data);

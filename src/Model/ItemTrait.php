@@ -1,12 +1,12 @@
 <?php
-namespace Ittweb\AccelaSearch\Model;
+namespace Ittweb\AccelaSearch\ProductMapper\Model;
 
 trait ItemTrait {
     use ArrayAccessTrait;
     use ObjectAccessTrait;
     use ArrayToJsonTrait;
 
-    private $data;
+    private $data = [];
 
     public function getAttributesAsDictionary(): array {
         return $this->data;

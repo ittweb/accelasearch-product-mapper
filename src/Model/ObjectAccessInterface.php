@@ -1,5 +1,5 @@
 <?php
-namespace Ittweb\AccelaSearch\Model;
+namespace Ittweb\AccelaSearch\ProductMapper\Model;
 
 interface ObjectAccessInterface {
     public function __isset(string $name);
