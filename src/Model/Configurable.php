@@ -39,8 +39,6 @@ class Configurable implements ItemInterface {
         $this->configurations[] = $product;
     }
 
-
-
     public function accept(ItemVisitorInterface $visitor) {
         $visitor->visitConfigurable($this);
     }
