@@ -3,40 +3,40 @@ namespace Ittweb\AccelaSearch\ProductMapper\Model;
 use \Ittweb\AccelaSearch\ProductMapper\Model\Stock\StockInfo as Stock;
 use \Ittweb\AccelaSearch\ProductMapper\Model\Price\MultiGroupPrice as Price;
 
-class Configurable implements ProductInterface {
+class Bundle implements ProductInterface {
     use ProductTrait;
 
-    private $configurations;
+    private $components;
 
     public function __construct(Stock $stock, Price $price) {
-        $this->configurations = [];
+        $this->components = [];
             $this->setStock($stock);
             $this->setPrice($price);
     }
 
     public function asArray(): array {
-        $configurations = [];
-        foreach ($this->configurations as $product) {
-            $configurations[] = $product->asArray();
+        $components = [];
+        foreach ($this->components as $product) {
+            $components[] = $product->asArray();
         }
         return [
             'header' => [
-                'type' => 'configurable'
+                'type' => 'bundle'
             ],
             'data' => $this->getAttributesAsDictionary(),
             'configurable_attributes' => $this->getConfigurableAttributesAsArray(),
-            'variants' => $configurations,
+            'bundles' => $components,
             'warehouses' => $this->getStock()->asArray(),
             'pricing' => $this->getPrice()->asArray()
         ];
     }
 
-    public function getConfigurationsAsArray(): array {
-        return $this->configurations;
+    public function getComponentsAsArray(): array {
+        return $this->components;
     }
 
-    public function addConfiguration(ProductInterface $product) {
-        $this->configurations[] = $product;
+    public function addComponent(ProductInterface $product) {
+        $this->components[] = $product;
     }
 
     public function accept(ItemVisitorInterface $visitor) {
