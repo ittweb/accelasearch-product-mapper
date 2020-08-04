@@ -13,7 +13,7 @@ trait ProductTrait {
     }
 
     public function addConfigurableAttribute(string $name) {
-        if (!is_array($name, $this->configurable_attributes))
+        if (!in_array($name, $this->configurable_attributes))
             $this->configurable_attributes[] = $name;
     }
 }

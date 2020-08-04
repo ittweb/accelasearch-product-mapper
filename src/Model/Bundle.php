@@ -10,8 +10,8 @@ class Bundle implements ProductInterface {
 
     public function __construct(Stock $stock, Price $price) {
         $this->components = [];
-            $this->setStock($stock);
-            $this->setPrice($price);
+        $this->setStock($stock);
+        $this->setPrice($price);
     }
 
     public function asArray(): array {

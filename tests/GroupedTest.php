@@ -13,7 +13,7 @@ final class GroupedTest extends TestCase {
         $simple->url = 'https://www.site.com';
         $item = new Grouped($stock, $price);
         $item->addComponent($simple);
-        $this->assertEquals(['header' => ['type' => 'grouped'], 'data' => [], 'configurable_attributes' => [], 'warehouses' => [], 'pricing' => [], 'Groupeds' => [['header' => ['type' => 'simple'], 'data' => ['url' => 'https://www.site.com'], 'configurable_attributes' => [], 'warehouses' => [], 'pricing' => []]]], $item->asArray());
+        $this->assertEquals(['header' => ['type' => 'grouped'], 'data' => [], 'configurable_attributes' => [], 'warehouses' => [], 'pricing' => [], 'bundles' => [['header' => ['type' => 'simple'], 'data' => ['url' => 'https://www.site.com'], 'configurable_attributes' => [], 'warehouses' => [], 'pricing' => []]]], $item->asArray());
     }
 
 
