@@ -15,7 +15,7 @@ class MultiTierPrice implements ArrayConvertibleInterface, JsonSerializable {
     public function asArray(): array {
         $tiers = [];
         foreach ($this->tiers as $quantity => $tier) {
-            $tiers[(string) $quantity] = $tier->asArray();
+            $tiers[$quantity] = $tier->asArray();
         }
         return $tiers;
     }
@@ -25,7 +25,7 @@ class MultiTierPrice implements ArrayConvertibleInterface, JsonSerializable {
     }
 
     public function add(float $quantity, MultiCurrencyPrice $tier) {
-        $this->tiers[(string) $quantity] = $tier;
+        $this->tiers[sprintf('%.04f', $quantity)] = $tier;
     }
 
     public function remove(float $quantity) {
