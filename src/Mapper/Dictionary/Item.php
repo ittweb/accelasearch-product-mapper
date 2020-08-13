@@ -47,24 +47,36 @@ class Item {
     }
 
     private function readAttributes(ItemInterface $item, array $data) {
+        if (!isset($data['data'])) {
+            return;
+        }
         foreach ($data['data'] as $key => $value) {
             $item->$key = $value;
         }
     }
 
     private function readConfigurableAttributes(ProductInterface $product, array $data) {
+        if (!isset($data['configurable_attributes'])) {
+            return;
+        }
         foreach ($data['configurable_attributes'] as $attribute_name) {
             $product->addConfigurableAttribute($attribute_name);
         }
     }
 
     private function readConfigurations(Configurable $configurable, array $data) {
+        if (!isset($data['variants'])) {
+            return;
+        }
         foreach ($data['variants'] as $configuration) {
             $configurable->addConfiguration($this->read($configuration));
         }
     }
 
     private function readComponents(Bundle $bundle, array $data) {
+        if (!isset($data['bundles'])) {
+            return;
+        }
         foreach ($data['bundles'] as $component) {
             $bundle->addComponent($this->read($component));
         }
