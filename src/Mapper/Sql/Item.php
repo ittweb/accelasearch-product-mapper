@@ -79,7 +79,7 @@ echo "rPTypes: " . (microtime(true) - $s) . "\n";
             . 'FROM price_info WHERE product_id = :id'
         );
         $this->search_by_parent_sth = $dbh->prepare(
-            'SELECT external_id FROM product WHERE parent_id = :parent_id'
+            'SELECT id FROM product WHERE parent_id = :parent_id'
         );
     }
 
@@ -151,7 +151,7 @@ echo "rReadQuery: " . (microtime(true) - $s) . "\n";
         $this->search_by_parent_sth->execute([':parent_id' => $parent_id]);
         $children = [];
         foreach ($this->search_by_parent_sth->fetchAll() as $record) {
-            $children[] = $this->read($record['external_id']);
+            $children[] = $this->read($record['id']);
         }
         return $children;
     }
