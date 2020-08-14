@@ -61,13 +61,13 @@ echo "rPTypes: " . (microtime(true) - $s) . "\n";
 
         // Prepares statements
         $this->read_product_sth = $dbh->prepare(
-            'SELECT id, product.type_id AS product_type, attribute_integer.type_id AS attribute_type, name, value FROM product JOIN attribute_integer ON product.id = attribute_integer.product_id WHERE product.shop_id = :shop_id AND product.external_id = :id AND product.deleted_at IS NULL '
+            'SELECT id, product.type_id AS product_type, attribute_integer.type_id AS attribute_type, name, value FROM product JOIN attribute_integer ON product.id = attribute_integer.product_id WHERE product.shop_id = :shop_id AND product.id = :id AND product.deleted_at IS NULL '
             . 'UNION '
-            . 'SELECT id, product.type_id AS product_type, attribute_real.type_id AS attribute_type, name, value FROM product JOIN attribute_real ON product.id = attribute_real.product_id WHERE product.shop_id = :shop_id AND product.external_id = :id AND product.deleted_at IS NULL '
+            . 'SELECT id, product.type_id AS product_type, attribute_real.type_id AS attribute_type, name, value FROM product JOIN attribute_real ON product.id = attribute_real.product_id WHERE product.shop_id = :shop_id AND product.id = :id AND product.deleted_at IS NULL '
             . 'UNION '
-            . 'SELECT id, product.type_id AS product_type, attribute_date.type_id AS attribute_type, name, value FROM product JOIN attribute_date ON product.id = attribute_date.product_id WHERE product.shop_id = :shop_id AND product.external_id = :id AND product.deleted_at IS NULL '
+            . 'SELECT id, product.type_id AS product_type, attribute_date.type_id AS attribute_type, name, value FROM product JOIN attribute_date ON product.id = attribute_date.product_id WHERE product.shop_id = :shop_id AND product.id = :id AND product.deleted_at IS NULL '
             . 'UNION '
-            . 'SELECT id, product.type_id AS product_type, attribute_text.type_id AS attribute_type, name, value FROM product JOIN attribute_text ON product.id = attribute_text.product_id WHERE product.shop_id = :shop_id AND product.external_id = :id AND product.deleted_at IS NULL '
+            . 'SELECT id, product.type_id AS product_type, attribute_text.type_id AS attribute_type, name, value FROM product JOIN attribute_text ON product.id = attribute_text.product_id WHERE product.shop_id = :shop_id AND product.id = :id AND product.deleted_at IS NULL '
         );
         $this->read_stock_sth = $dbh->prepare(
             'SELECT warehouse_id, is_virtual, latitude, longitude, is_unlimited, quantity '
