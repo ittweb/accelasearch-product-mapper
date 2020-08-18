@@ -41,6 +41,6 @@ final class MultiTierPriceTest extends TestCase {
         $price_tier->add('eur', $price_eur);
         $price = new MultiTierPrice();
         $price->add(0.0, $price_tier);
-        $this->assertEquals(['0' => ['EUR' => ['listing_price' => 10.0, 'selling_price' => 10.0]]], $price->asArray());
+        $this->assertEquals(['0.0000' => ['EUR' => ['listing_price' => 10.0, 'selling_price' => 10.0]]], $price->asArray());
     }
 }

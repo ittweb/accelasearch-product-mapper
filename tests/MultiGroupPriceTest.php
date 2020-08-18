@@ -50,6 +50,6 @@ final class MultiGroupPriceTest extends TestCase {
         $price_group->add(0.0, $price_tier);
         $price = new MultiGroupPrice();
         $price->add('group_id', $price_group);
-        $this->assertEquals(['group_id' => ['0' => ['EUR' => ['listing_price' => 10.0, 'selling_price' => 10.0]]]], $price->asArray());
+        $this->assertEquals(['group_id' => ['0.0000' => ['EUR' => ['listing_price' => 10.0, 'selling_price' => 10.0]]]], $price->asArray());
     }
 }
