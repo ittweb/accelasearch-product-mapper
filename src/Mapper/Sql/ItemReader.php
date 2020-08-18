@@ -5,7 +5,7 @@ use \PDO;
 use \Ittweb\AccelaSearch\ProductMapper\Model\ItemInterface;
 
 class ItemReader {
-    const HAS_STOCK_AND_PRICE =['simple', 'virtual', 'downloadable', 'configurable', 'grouped', 'bundle'];
+    const HAS_STOCK_AND_PRICE = ['simple', 'virtual', 'downloadable', 'configurable', 'grouped', 'bundle'];
     const HAS_CONFIGURATIONS = ['configurable'];
     const HAS_COMPONENTS = ['bundle', 'grouped'];
     private $dbh;
@@ -54,10 +54,10 @@ class ItemReader {
               : new $class_name();
         $this->readAttributes($item, $data);
         if ($this->hasConfigurations($product_type)) {
-            $this->readConfigurations($item, $data);
+            $this->readConfigurations($item, $product_id);
         }
         if ($this->hasComponents($product_type)) {
-            $this->readComponents($item, $data);
+            $this->readComponents($item, $product_id);
         }
         return $item;
     }

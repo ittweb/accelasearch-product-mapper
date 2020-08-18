@@ -8,11 +8,31 @@ use \Ittweb\AccelaSearch\ProductMapper\Model\Price\MultiGroupPrice;
 
 class Price {
     private $dbh;
+    private $create_sth;
     private $read_sth;
 
     public function __construct(PDO $dbh) {
         $this->dbh = $dbh;
         $this->prepareStatements();
+    }
+
+    public function create(MultiGroupPrice $multi_group, int $product_id, string $product_external_id, int $shop_id) {
+        foreach ($multi_group->asDictionary() as $group_id => $multi_tier) {
+            foreach ($multi_tier->asDictionary() as $minimum_quantity => $multi_currency) {
+                foreach ($multi_currency->asDictionary() as $currency => $price) {
+                    $this->create_sth->execute([
+                        ':product_id' => $product_id,
+                        ':product_external_id' => $product_external_id,
+                        ':shop_id' => $shop_id,
+                        ':group_id' => $group_id,
+                        ':currency' => $currency,
+                        ':minimum_quantity' => $minimum_quantity,
+                        ':listing_price' => $price->getListingPrice(),
+                        ':selling_price' => $price->getSellingPrice()
+                    ]);
+                }
+            }
+        }
     }
 
     public function read(int $product_id): MultiGroupPrice {
@@ -41,9 +61,13 @@ class Price {
     }
 
     private function prepareStatements() {
+        $this->create_sth = $this->dbh->prepare(
+            'INSERT INTO price_info(product_id, product_external_id, shop_id, group_id, currency, minimum_quantity, listing_price, selling_price) '
+          . 'VALUES(:product_id, :product_external_id, :shop_id, :group_id, :currency, :minimum_quantity, :listing_price, :selling_price)'
+        );
         $this->read_sth = $this->dbh->prepare(
             'SELECT currency, minimum_quantity, group_id, listing_price, selling_price '
-            . 'FROM price_info WHERE product_id = :id'
+          . 'FROM price_info WHERE product_id = :id'
         );
     }
 }

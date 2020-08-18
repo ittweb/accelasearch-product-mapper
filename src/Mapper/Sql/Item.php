@@ -16,6 +16,7 @@ class Item {
     private $attribute_types;
     private $stock_mapper;
     private $price_mapper;
+    private $writer;
     private $reader;
 
     public function __construct(PDO $dbh, int $shop_id, string $identifier_attribute) {
@@ -28,7 +29,8 @@ class Item {
         $this->readAttributeTypes();
         $this->stock_mapper = new Stock($dbh);
         $this->price_mapper = new Price($dbh);
-        $this->item_reader = null;
+        $this->writer = null;
+        $this->reader = null;
     }
 
     public static function getCredentialFromApiKey(string $api_key): array {
@@ -56,7 +58,9 @@ class Item {
         $this->configurable_fields[] = $configurable_field;
     }
 
-    //public function create(ItemInterface $item, ItemInterface $parent = null)
+    public function create(ItemInterface $item) {
+        $this->getWriter()->write($item);
+    }
 
     public function read(int $identifier): ItemInterface {
         return $this->getReader()->read($identifier);
@@ -96,5 +100,22 @@ class Item {
             );
         }
         return $this->reader;
+    }
+
+    private function getWriter(): ItemWriter {
+        if (is_null($this->writer)) {
+            $this->writer = new ItemWriter(
+                $this->dbh,
+                $this->shop_id,
+                $this->identifier_attribute,
+                $this->category_fields,
+                $this->configurable_fields,
+                $this->product_types,
+                $this->attribute_types,
+                $this->stock_mapper,
+                $this->price_mapper
+            );
+        }
+        return $this->writer;
     }
 }
