@@ -10,7 +10,8 @@ class Item {
     private $dbh;
     private $shop_id;
     private $identifier_attribute;
-    private $category_field;
+    private $category_fields;
+    private $configurable_fields;
     private $product_types;
     private $attribute_types;
     private $stock_mapper;
@@ -21,7 +22,8 @@ class Item {
         $this->dbh = $dbh;
         $this->shop_id = $shop_id;
         $this->identifier_attribute = $identifier_attribute;
-        $this->category_field = null;
+        $this->category_fields = [];
+        $this->configurable_fields = [];
         $this->readProductTypes();
         $this->readAttributeTypes();
         $this->stock_mapper = new Stock($dbh);
@@ -46,13 +48,17 @@ class Item {
         return json_decode($response, true);
     }
 
-    public function setCategoryField(string $category_field) {
-        $this->category_field = $category_field;
+    public function addCategoryField(string $category_field) {
+        $this->category_fields[] = $category_field;
     }
 
-    //public function create()
+    public function addConfigurableField(string $configurable_field) {
+        $this->configurable_fields[] = $configurable_field;
+    }
 
-    public function read(string $identifier): ItemInterface {
+    //public function create(ItemInterface $item, ItemInterface $parent = null)
+
+    public function read(int $identifier): ItemInterface {
         return $this->getReader()->read($identifier);
     }
 
