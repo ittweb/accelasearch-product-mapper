@@ -68,9 +68,18 @@ class Item {
 
     //public function update()
 
-    //public function delete()
+    public function delete(int $identifier) {
+        $sth = $this->dbh->prepare(
+            'UPDATE product SET deleted_at = CURRENT_TIMESTAMP() '
+          . 'WHERE id = :product_id'
+        );
+        $sth->execute([':product_id' => $identifier]);
+    }
 
-    //public function hardDelete()
+    public function hardDelete() {
+        $query = 'DELETE FROM product WHERE deleted_at IS NOT NULL';
+        $this->dbh->query($query);
+    }
 
     private function readProductTypes() {
         $this->product_types = [];
