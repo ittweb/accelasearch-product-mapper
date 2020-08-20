@@ -18,6 +18,7 @@ class Item {
     private $price_mapper;
     private $writer;
     private $reader;
+    private $updater;
 
     public function __construct(PDO $dbh, int $shop_id, string $identifier_attribute) {
         $this->dbh = $dbh;
@@ -31,6 +32,7 @@ class Item {
         $this->price_mapper = new Price($dbh);
         $this->writer = null;
         $this->reader = null;
+        $this->updater = null;
     }
 
     public static function getCredentialFromApiKey(string $api_key): array {
@@ -66,7 +68,9 @@ class Item {
         return $this->getReader()->read($identifier);
     }
 
-    //public function update()
+    public function update(ItemInterface $item) {
+        $this->getUpdater()->update($item);
+    }
 
     public function delete(int $identifier) {
         $sth = $this->dbh->prepare(
@@ -126,5 +130,19 @@ class Item {
             );
         }
         return $this->writer;
+    }
+
+    public function getUpdater(): ItemUpdater {
+        if (is_null($this->updater)) {
+            $this->updater = new ItemUpdater(
+                $this->dbh,
+                $this->shop_id,
+                $this->identifier_attribute,
+                $this->stock_mapper,
+                $this->price_mapper,
+                $this->getWriter()
+            );
+        }
+        return $this->updater;
     }
 }

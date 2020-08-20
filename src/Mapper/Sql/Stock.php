@@ -11,6 +11,7 @@ class Stock {
     private $dbh;
     private $create_sth;
     private $read_sth;
+    private $delete_external_sth;
 
     public function __construct(PDO $dbh) {
         $this->dbh = $dbh;
@@ -47,6 +48,13 @@ class Stock {
         return $stock;
     }
 
+    public function deleteByExternalId(string $external_id, int $shop_id) {
+        $this->delete_external_sth->execute([
+            ':product_external_id' => $external_id,
+            ':shop_id' => $shop_id
+        ]);
+    }
+
     private function prepareStatements() {
         $this->create_sth = $this->dbh->prepare(
             'INSERT INTO stock_info(product_id, product_external_id, shop_id, warehouse_id, quantity, is_unlimited) '
@@ -56,6 +64,9 @@ class Stock {
             'SELECT warehouse_id, is_virtual, latitude, longitude, is_unlimited, quantity '
             . 'FROM stock_info JOIN warehouse ON stock_info.warehouse_id = warehouse.id '
             . 'WHERE stock_info.product_id = :id'
+        );
+        $this->delete_external_sth = $this->dbh->prepare(
+            'DELETE FROM stock_info WHERE product_external_id = :product_external_id AND shop_id = :shop_id'
         );
     }
 }

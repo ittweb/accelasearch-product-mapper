@@ -10,6 +10,7 @@ class Price {
     private $dbh;
     private $create_sth;
     private $read_sth;
+    private $delete_external_sth;
 
     public function __construct(PDO $dbh) {
         $this->dbh = $dbh;
@@ -60,6 +61,13 @@ class Price {
         return $group_price;
     }
 
+    public function deleteByExternalId(string $external_id, int $shop_id) {
+        $this->delete_external_sth->execute([
+            ':product_external_id' => $external_id,
+            ':shop_id' => $shop_id
+        ]);
+    }
+
     private function prepareStatements() {
         $this->create_sth = $this->dbh->prepare(
             'INSERT INTO price_info(product_id, product_external_id, shop_id, group_id, currency, minimum_quantity, listing_price, selling_price) '
@@ -68,6 +76,9 @@ class Price {
         $this->read_sth = $this->dbh->prepare(
             'SELECT currency, minimum_quantity, group_id, listing_price, selling_price '
           . 'FROM price_info WHERE product_id = :id'
+        );
+        $this->delete_external_sth = $this->dbh->prepare(
+            'DELETE FROM price_info WHERE product_external_id = :product_external_id AND shop_id = :shop_id'
         );
     }
 }

@@ -77,7 +77,7 @@ class ItemWriter {
         );
     }
 
-    private function getItemType(Item $item): string {
+    public function getItemType(Item $item): string {
         return strtolower(basename(str_replace('\\', '/', get_class($item))));
     }
 
@@ -97,7 +97,7 @@ class ItemWriter {
         return $item_id;
     }
 
-    private function writeAttributes(Item $item, int $item_id) {
+    public function writeAttributes(Item $item, int $item_id) {
         $query = 'INSERT INTO attribute_text(product_id, product_external_id, shop_id, type_id, name, value) VALUES ';
         $clauses = [];
         $bound_parameters = [];
