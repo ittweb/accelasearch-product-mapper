@@ -73,7 +73,7 @@ class ItemReader {
             . 'SELECT id, product.type_id AS product_type, attribute_text.type_id AS attribute_type, name, value FROM product JOIN attribute_text ON product.id = attribute_text.product_id WHERE product.shop_id = :shop_id AND product.id = :id AND product.deleted_at IS NULL '
         );
         $this->search_by_parent_sth = $this->dbh->prepare(
-            'SELECT id FROM product WHERE parent_id = :parent_id'
+            'SELECT id FROM product WHERE parent_id = :parent_id AND deleted_at IS NULL'
         );
     }
 
