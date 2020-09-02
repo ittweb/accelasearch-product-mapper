@@ -51,7 +51,8 @@ class Price {
             foreach ($group_data as $minimum_quantity => $tier_data) {
                 $currency_price = new MultiCurrencyPrice();
                 foreach ($tier_data as $currency => $price_data) {
-                    $price = new BasePrice($price_data['listing_price'], $price_data['selling_price']);
+                    $price = new BasePrice($price_data['listing_price']);
+                    $price->setSellingPrice($price_data['selling_price']);
                     $currency_price->add($currency, $price);
                 }
                 $tier_price->add($minimum_quantity, $currency_price);
