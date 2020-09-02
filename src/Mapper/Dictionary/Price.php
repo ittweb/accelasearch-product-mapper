@@ -37,6 +37,8 @@ class Price {
     }
 
     private function readBasePrice(array $data): BasePrice {
-        return new BasePrice($data['listing_price'], $data['selling_price']);
+        $price = new BasePrice($data['listing_price']);
+        $price->setSellingPrice($data['selling_price']);
+        return $price;
     }
 }
