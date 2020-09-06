@@ -6,7 +6,7 @@ use \OutOfBoundsException;
 use \PDO;
 
 class Item {
-    const API_HOST = 'http://accelasearch.dev1.accelasearch.net';
+    const API_HOST = 'https://svc10.accelasearch.io';
     private $dbh;
     private $shop_id;
     private $identifier_attribute;
@@ -72,10 +72,10 @@ class Item {
         $this->getUpdater()->update($item);
     }
 
-    public function delete(int $identifier) {
+    public function delete(strng $identifier) {
         $sth = $this->dbh->prepare(
             'UPDATE product SET deleted_at = CURRENT_TIMESTAMP() '
-          . 'WHERE id = :product_id'
+          . 'WHERE external_id = :product_id AND deleted_at IS NULL'
         );
         $sth->execute([':product_id' => $identifier]);
     }
