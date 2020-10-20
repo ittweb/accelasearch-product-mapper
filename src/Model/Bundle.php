@@ -14,6 +14,10 @@ class Bundle implements ProductInterface {
         $this->setPrice($price);
     }
 
+    public function hasChildren(): bool {
+        return !empty($this->components);
+    }
+
     public function asArray(): array {
         $components = [];
         foreach ($this->components as $product) {
@@ -33,6 +37,10 @@ class Bundle implements ProductInterface {
 
     public function getComponentsAsArray(): array {
         return $this->components;
+    }
+
+    public function getChildrenAsArray(): array {
+        return $this->getComponentsAsArray();
     }
 
     public function addComponent(ProductInterface $product) {

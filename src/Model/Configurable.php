@@ -14,6 +14,10 @@ class Configurable implements ProductInterface {
             $this->setPrice($price);
     }
 
+    public function hasChildren(): bool {
+        return !empty($this->configurations);
+    }
+
     public function asArray(): array {
         $configurations = [];
         foreach ($this->configurations as $product) {
@@ -33,6 +37,10 @@ class Configurable implements ProductInterface {
 
     public function getConfigurationsAsArray(): array {
         return $this->configurations;
+    }
+
+    public function getChildrenAsArray(): array {
+        return $this->getConfigurationsAsArray();
     }
 
     public function addConfiguration(ProductInterface $product) {

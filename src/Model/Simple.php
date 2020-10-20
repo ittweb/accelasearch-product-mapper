@@ -4,6 +4,7 @@ use \Ittweb\AccelaSearch\ProductMapper\Model\Stock\StockInfo as Stock;
 use \Ittweb\AccelaSearch\ProductMapper\Model\Price\MultiGroupPrice as Price;
 
 class Simple implements ProductInterface {
+    use SingleItemTrait;
     use ProductTrait;
 
     public function __construct(Stock $stock, Price $price) {

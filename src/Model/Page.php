@@ -2,7 +2,7 @@
 namespace Ittweb\AccelaSearch\ProductMapper\Model;
 
 class Page implements ItemInterface {
-    use ItemTrait;
+    use SingleItemTrait;
 
     public function asArray(): array {
         return [
