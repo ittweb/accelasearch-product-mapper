@@ -2,6 +2,7 @@
 namespace Ittweb\AccelaSearch\ProductMapper\Model;
 
 class Banner implements ItemInterface {
+    use ItemTrait;
     use SingleItemTrait;
 
     public function asArray(): array {
