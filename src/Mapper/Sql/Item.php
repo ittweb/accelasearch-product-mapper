@@ -85,6 +85,17 @@ class Item {
         $this->dbh->query($query);
     }
 
+    public function getAttributesAsArray(): array {
+        $query = 'SELECT name FROM attribute_text WHERE shop_id = :shop_id '
+               . 'UNION SELECT name FROM attribute_integer WHERE shop_id = :shop_id '
+               . 'UNION SELECT name FROM attribute_real WHERE shop_id = :shop_id '
+               . 'UNION SELECT name FROM attribute_date WHERE shop_id = :shop_id';
+        $sth = $this->dbh->prepare($query);
+        $sth->execute([':shop_id' => $this->shop_id]);
+        $attributes = $sth->fetchAll();
+        return $attributes;
+    }
+
     private function readProductTypes() {
         $this->product_types = [];
         $sth = $this->dbh->query('SELECT id, name FROM product_type');
