@@ -72,7 +72,7 @@ class Item {
         $this->getUpdater()->update($item);
     }
 
-    public function delete(strng $identifier) {
+    public function delete(string $identifier) {
         $sth = $this->dbh->prepare(
             'UPDATE product SET deleted_at = CURRENT_TIMESTAMP() '
           . 'WHERE external_id = :product_id AND deleted_at IS NULL'
