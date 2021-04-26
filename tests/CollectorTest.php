@@ -1,20 +1,25 @@
 <?php declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
-use \Ittweb\AccelaSearch\ProductMapper\Cms;
+use \Ittweb\AccelaSearch\ProductMapper\Collector;
 
-final class CmsTest extends TestCase {
-    public function testIdentifier() {
-        $cms = new Cms(1, 'name', 'version');
-        $this->assertEquals(1, $cms->getIdentifier());
+final class CollectorTest extends TestCase {
+    public function testHostName() {
+        $collector = new Collector('host', 'db', 'user', 'pass');
+        $this->assertEquals('host', $collector->getHostName());
     }
 
-    public function testName() {
-        $cms = new Cms(1, 'name', 'version');
-        $this->assertEquals('name', $cms->getName());
+    public function testDatabaseName() {
+        $collector = new Collector('host', 'db', 'user', 'pass');
+        $this->assertEquals('db', $collector->getDatabaseName());
     }
 
-    public function testVersion() {
-        $cms = new Cms(1, 'name', 'version');
-        $this->assertEquals('version', $cms->getVersion());
+    public function testUsername() {
+        $collector = new Collector('host', 'db', 'user', 'pass');
+        $this->assertEquals('user', $collector->getUsername());
+    }
+
+    public function testPassword() {
+        $collector = new Collector('host', 'db', 'user', 'pass');
+        $this->assertEquals('pass', $collector->getPassword());
     }
 }
