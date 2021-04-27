@@ -18,14 +18,16 @@ class Shop {
 
     public function create(Subject $shop): self {
         $query = 'INSERT INTO storeviews(url, description, langiso, hash, cmsid) '
-            . 'VALUES(:url, :description, :language_iso, :cms_identifier)';
+            . 'VALUES(:url, :description, :language_iso, :hash, :cms_identifier)';
         $sth = $this->dbh->prepare($query);
         $sth->execute([
             ':url' => $shop->getUrl(),
             ':description' => $shop->getDescription(),
             ':language_iso' => $shop->getLanguageIso(),
+            ':hash' => $shop->getHash(),
             ':cms_identifier' => $shop->getCms()->getIdentifier()
         ]);
+        $shop->setIdentifier($this->dbh->lastInsertId());
         return $this;
     }
 
@@ -33,7 +35,7 @@ class Shop {
         $query = 'SELECT id, url, description, langiso, cmsid, disabled, firstinit, lastsync, lastupdate '
             . 'FROM storeviews WHERE id = :identifier';
         $sth = $this->dbh->prepare($query);
-        $sh->execute([':identifier' => $identifier]);
+        $sth->execute([':identifier' => $identifier]);
         $row = $sth->fetch();
         if (empty($row)) {
             throw new OutOfBoundsException('No shops with identifier ' . $identifier . '.');
@@ -47,6 +49,7 @@ class Shop {
         $sth->execute([
             ':identifier' => $shop->getIdentifier(),
             ':url' => $shop->getUrl(),
+            ':description' => $shop->getDescription(),
             ':language_iso' => $shop->getLanguageIso(),
             ':cms_identifier' => $shop->getCms()->getIdentifier(),
             ':is_disabled' => $shop->isActive() ? 0 : 1,
