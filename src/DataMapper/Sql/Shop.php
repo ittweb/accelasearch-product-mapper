@@ -17,8 +17,8 @@ class Shop {
     }
 
     public function create(Subject $shop): self {
-        $query = 'INSERT INTO storeviews(url, description, langiso, hash, cmsid) '
-            . 'VALUES(:url, :description, :language_iso, :hash, :cms_identifier)';
+        $query = 'INSERT INTO storeviews(url, description, langiso, siteid, storeid, viewid, hash, cmsid) '
+            . 'VALUES(:url, :description, :language_iso, 1, 1, 1, :hash, :cms_identifier)';
         $sth = $this->dbh->prepare($query);
         $sth->execute([
             ':url' => $shop->getUrl(),
@@ -44,7 +44,7 @@ class Shop {
     }
 
     public function update(Subject $shop): self {
-        $query = 'UPDATE storeviews SET url = :url, description = :description, langiso = :language_iso, cmsid = :cms_identifier, disabled = :is_disabled, firstinit = :initialization_timestamp, lastsync = :last_synchronization_timestamp, lastupdate = :last_update_timestamp WHERE id = :identifier';
+        $query = 'UPDATE storeviews SET url = :url, description = :description, langiso = :language_iso, cmsid = :cms_identifier, disabled = :is_disabled, firstinit = :initialization_timestamp, lastsync = :last_synchronization_timestamp, lastupdate = :last_update_timestamp, deleted = 0 WHERE id = :identifier';
         $sth = $this->dbh->prepare($query);
         $sth->execute([
             ':identifier' => $shop->getIdentifier(),
