@@ -1,7 +1,7 @@
 <?php
 namespace Ittweb\AccelaSearch\ProductMapper;
 
-interface ProductInterface extends ItemInterface {
+interface ProductInterface extends ItemInterface, StockableInterface, SellableInterface {
     public function getExternalIdentifier(): string;
     public function setExternalIdentifier(string $identifier): self;
     public function getCategoriesAsArray(): array;

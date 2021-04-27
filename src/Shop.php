@@ -105,7 +105,12 @@ class Shop {
         return $this;
     }
 
-    public function getLastUpdateTimestamp(): int {
+    public function getLastUpdateTimestamp(): ?int {
         return $this->last_update_timestamp;
+    }
+
+    public function setLastUpdateTimestamp(int $timestamp): self {
+        $this->last_update_timestamp = $timestamp;
+        return $this;
     }
 }

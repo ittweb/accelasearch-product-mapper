@@ -14,6 +14,10 @@ class Availability {
         return $availability;
     }
 
+    public function asArray(): array {
+        return $this->stocks;
+    }
+
     public function add(Stock $stock): self {
         $this->stocks[] = $stock;
         return $this;
