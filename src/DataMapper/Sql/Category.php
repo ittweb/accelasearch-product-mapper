@@ -70,6 +70,17 @@ class Category {
         return $this;
     }
 
+    public function search(): array {
+        $query = 'SELECT id, parentid, categoryname, fullcategoryname, externalidstr, url FROM categories WHERE storeviewid = :shop_identifier';
+        $sth = $this->connection->getDbh()->prepare($query);
+        $sth->execute([':shop_identifier' => $this->connection->getShopIdentifier()]);
+        $categories = [];
+        while ($row = $sth->fetch()) {
+            $categories[] = $this->rowToCategory($row);
+        }
+        return $categories;
+    }
+
     private function rowToCategory(array $row): Subject {
         $category = new Subject(
             $row['externalidstr'],

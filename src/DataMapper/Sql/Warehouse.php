@@ -76,9 +76,9 @@ class Warehouse {
     }
 
     public function search(): array {
-        $query = 'SELECT id, label, latitude, longitude, isvirtual FROM warehouses';
+        $query = 'SELECT id, label, latitude, longitude, isvirtual FROM warehouses WHERE storeviewid = :shop_identifier';
         $sth = $this->connection->getDbh()->prepare($query);
-        $sth->execute();
+        $sth->execute([':shop_identifier' => $this->connection->getShopIdentifier()]);
         $warehouses = [];
         while ($row = $sth->fetch()) {
             $warehouses[] = $this->rowToWarehouse($row);
