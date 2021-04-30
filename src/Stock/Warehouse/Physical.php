@@ -28,4 +28,3 @@ class Physical implements WarehouseInterface {
         return $visitor->visitPhysical($this);
     }
 }
-}
