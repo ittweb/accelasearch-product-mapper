@@ -37,6 +37,6 @@ class CustomerGroup {
     }
 
     public function search(callable $criterion): array {
-        return array_filter($this->groups, $criterion);
+        return array_values(array_filter($this->groups, $criterion));
     }
 }

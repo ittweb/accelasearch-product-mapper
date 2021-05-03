@@ -52,6 +52,15 @@ class Price {
         return $this;
     }
 
+    public function getCurrency(): string {
+        return $this->currency;
+    }
+
+    public function setCurrency(string $currency): self {
+        $this->currency = $currency;
+        return $this;
+    }
+
     public function getMinimumQuantity(): float {
         return $this->minimum_quantity;
     }

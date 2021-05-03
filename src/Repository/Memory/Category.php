@@ -37,6 +37,6 @@ class Category {
     }
 
     public function search(callable $criterion): array {
-        return array_filter($this->categories, $criterion);
+        return array_values(array_filter($this->categories, $criterion));
     }
 }

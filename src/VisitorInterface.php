@@ -6,7 +6,7 @@ interface VisitorInterface {
     public function visitPage(Page $item);
     public function visitCategoryPage(CategoryPage $item);
     public function visitSimple(Simple $item);
-    public function visistVirtual(Virtual $item);
+    public function visitVirtual(Virtual $item);
     public function visitDownloadable(Downloadable $item);
     public function visitConfigurable(Configurable $item);
     public function visitBundle(Bundle $item);

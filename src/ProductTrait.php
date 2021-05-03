@@ -26,6 +26,7 @@ trait ProductTrait {
 
     public function addCategory(Category $category): self {
         $this->categories[$category->getExternalIdentifier()] = $category;
+        return $this;
     }
 
     public function removeCategory(Category $category): self {
@@ -47,12 +48,7 @@ trait ProductTrait {
     }
 
     public function addAttribute(Attribute $attribute): self {
-        if (!array_key_exists($attribute->getName(), $this->attributes)) {
-            $this->attributes[$attribute->getName()] = [$attribute];
-        }
-        else {
-            $this->attributes[$attribute->getName()][] = $attribute;
-        }
+        $this->attributes[$attribute->getName()] = $attribute;
         return $this;
     }
 

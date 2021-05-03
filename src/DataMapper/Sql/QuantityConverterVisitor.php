@@ -5,7 +5,7 @@ use \Ittweb\AccelaSearch\ProductMapper\Stock\Quantity\Limited;
 use \Ittweb\AccelaSearch\ProductMapper\Stock\Quantity\Unlimited;
 
 class QuantityConverterVisitor implements VisitorInterface {
-    public function visistLimited(Limited $quantity) {
+    public function visitLimited(Limited $quantity) {
         return [
             'is_unlimited' => false,
             'quantity' => $quantity->getQuantity()
