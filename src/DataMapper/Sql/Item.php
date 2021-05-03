@@ -64,6 +64,9 @@ class Item implements ItemMapperInterface {
             $this->insertAvailability($item);
             $this->insertPricing($item);
         }
+        foreach ($children as $child) {
+            $this->create($child, $item->getIdentifier());
+        }
         return $this;
     }
 
