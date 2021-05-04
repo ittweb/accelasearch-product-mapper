@@ -42,30 +42,43 @@ class Item implements ItemMapperInterface {
         );
     }
 
-    public function create(ItemInterface $item, ?int $parent_identifier = null): self {
-        $children = $item->accept($this->item_get_children);
-        $query = 'INSERT INTO products(sku, siteid, parentid, haschild, typeid, externalidstr, url) '
-            . 'VALUES(:sku, :shop_identifier, :parent_identifier, :has_children, :type_identifier, :external_identifier, :url)';
+    public function create(ItemInterface $item): self {
+        // Inserts base information
+        $query = 'INSERT INTO products(sku, siteid, typeid, externalidstr, url) '
+            . 'VALUES(:sku, :shop_identifier, :type_identifier, :external_identifier, :url) '
+            . 'ON DUPLICATE KEY UPDATE sku = :sku, typeid = :type_identifier, externalidstr = :external_identifier, url = :url, deleted = 0';
         $sth = $this->connection->getDbh()->prepare($query);
         $sth->execute([
             ':sku' => $item->getSku(),
             ':shop_identifier' => $this->connection->getShopIdentifier(),
-            ':parent_identifier' => $parent_identifier,
-            ':has_children' => count($children),
             ':type_identifier' => $item->accept($this->item_get_type),
             ':external_identifier' => $item->accept($this->item_is_product) ? $item->getExternalIdentifier() : null,
             ':url' => $item->getUrl()
         ]);
         $item->setIdentifier($this->connection->getDbh()->lastInsertId());
+
+        // Inserts additional information
         if ($item->accept($this->item_is_product)) {
+            $this->clear($item);
             $this->insertAttributes($item);
             $this->insertCategories($item);
             $this->insertImageInfo($item);
             $this->insertAvailability($item);
             $this->insertPricing($item);
         }
-        foreach ($children as $child) {
-            $this->create($child, $item->getIdentifier());
+
+        // Inserts children
+        $query = 'UPDATE products_children SET deleted = 1 WHERE parentid = :parent_identifier';
+        $sth = $this->connection->getDbh()->prepare($query);
+        $sth->execute([':parent_identifier' => $item->getIdentifier()]);
+        $query = 'INSERT INTO products_children(productid, parentid) VALUES(:child_identifier, :parent_identifier)';
+        $sth = $this->connection->getDbh()->prepare($query);
+        foreach ($item->accept($this->item_get_children) as $child) {
+            $this->create($child);
+            $sth->execute([
+                ':child_identifier' => $child->getIdentifier(),
+                ':parent_identifier' => $item->getIdentifier()
+            ]);
         }
         return $this;
     }
@@ -75,38 +88,10 @@ class Item implements ItemMapperInterface {
     }
 
     public function update(ItemInterface $item): self {
-        $children = $item->accept($this->item_get_children);
-        $this->clear($item);
-        $query = 'UPDATE products SET sku = :sku, haschild = :has_children, typeid = :type_identifier, externalidstr = :external_identifier, url = :url, deleted = 0 '
-            . 'WHERE id = :identifier';
-        $sth = $this->connection->getDbh()->prepare($query);
-        $sth->execute([
-            ':identifier' => $item->getIdentifier(),
-            ':sku' => $item->getSku(),
-            ':has_children' => count($children),
-            ':type_identifier' => $item->accept($this->item_get_type),
-            ':external_identifier' => $item->accept($this->item_is_product) ? $item->getExternalIdentifier() : null,
-            ':url' => $item->getUrl()
-        ]);
-        if ($item->accept($this->item_is_product)) {
-            $this->insertAttributes($item);
-            $this->insertCategories($item);
-            $this->insertImageInfo($item);
-            $this->insertAvailability($item);
-            $this->insertPricing($item);
-        }
-        foreach ($children as $child) {
-            $this->softDelete($child);
-            $this->create($child, $item->getIdentifier());
-        }
-        return $this;
+        return $this->create($item);
     }
 
     public function delete(ItemInterface $item): self {
-        $children = $item->accept($this->item_get_children);
-        foreach ($children as $child) {
-            $this->delete($child);
-        }
         $sth = $this->connection->getDbh()->prepare('DELETE FROM products_attr_text WHERE productid = :identifier');
         $sth->execute([':identifier' => $item->getIdentifier()]);
         $sth = $this->connection->getDbh()->prepare('DELETE FROM products_categories WHERE productid = :identifier');
@@ -117,14 +102,18 @@ class Item implements ItemMapperInterface {
         $sth->execute([':identifier' => $item->getIdentifier()]);
         $sth = $this->connection->getDbh()->prepare('DELETE FROM prices WHERE productid = :identifier');
         $sth->execute([':identifier' => $item->getIdentifier()]);
+        $sth = $this->connection->getDbh()->prepare('DELETE FROM products_children WHERE productid = :identifier OR parentid = :identifier');
+        $sth->execute([':identifier' => $item->getIdentifier()]);
         $sth = $this->connection->getDbh()->prepare('DELETE FROM products WHERE id = :identifier');
         $sth->execute([':identifier' => $item->getIdentifier()]);
         return $this;
     }
 
     public function softDelete(ItemInterface $item): self {
-        $query = 'UPDATE products SET deleted = 1 WHERE id = :identifier';
-        $sth = $this->connection->getDbh()->prepare($query);
+        $sth = $this->connection->getDbh()->prepare('UPDATE products SET deleted = 1 WHERE id = :identifier');
+        $sth->execute([':identifier' => $item->getIdentifier()]);
+        $this->clear($item);
+        $sth = $this->connection->getDbh()->prepare('UPDATE products_children SET deleted = 1 WHERE productid = :identifier OR parentid = :identifier');
         $sth->execute([':identifier' => $item->getIdentifier()]);
         return $this;
     }
