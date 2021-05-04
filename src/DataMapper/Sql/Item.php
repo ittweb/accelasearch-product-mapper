@@ -75,18 +75,61 @@ class Item implements ItemMapperInterface {
     }
 
     public function update(ItemInterface $item): self {
+        $children = $item->accept($this->item_get_children);
+        $this->clear($item);
+        $query = 'UPDATE products SET sku = :sku, haschild = :has_children, typeid = :type_identifier, externalidstr = :external_identifier, url = :url, deleted = 0 '
+            . 'WHERE id = :identifier';
+        $sth = $this->connection->getDbh()->prepare($query);
+        $sth->execute([
+            ':identifier' => $item->getIdentifier(),
+            ':sku' => $item->getSku(),
+            ':has_children' => count($children),
+            ':type_identifier' => $item->accept($this->item_get_type),
+            ':external_identifier' => $item->accept($this->item_is_product) ? $item->getExternalIdentifier() : null,
+            ':url' => $item->getUrl()
+        ]);
+        if ($item->accept($this->item_is_product)) {
+            $this->insertAttributes($item);
+            $this->insertCategories($item);
+            $this->insertImageInfo($item);
+            $this->insertAvailability($item);
+            $this->insertPricing($item);
+        }
+        foreach ($children as $child) {
+            $this->softDelete($child);
+            $this->create($child, $item->getIdentifier());
+        }
         return $this;
     }
 
-    public function delete(Query $query): self {
+    public function delete(ItemInterface $item): self {
+        $children = $item->accept($this->item_get_children);
+        foreach ($children as $child) {
+            $this->delete($child);
+        }
+        $sth = $this->connection->getDbh()->prepare('DELETE FROM products_attr_text WHERE productid = :identifier');
+        $sth->execute([':identifier' => $item->getIdentifier()]);
+        $sth = $this->connection->getDbh()->prepare('DELETE FROM products_categories WHERE productid = :identifier');
+        $sth->execute([':identifier' => $item->getIdentifier()]);
+        $sth = $this->connection->getDbh()->prepare('DELETE FROM products_images WHERE productid = :identifier');
+        $sth->execute([':identifier' => $item->getIdentifier()]);
+        $sth = $this->connection->getDbh()->prepare('DELETE FROM stocks WHERE productid = :identifier');
+        $sth->execute([':identifier' => $item->getIdentifier()]);
+        $sth = $this->connection->getDbh()->prepare('DELETE FROM prices WHERE productid = :identifier');
+        $sth->execute([':identifier' => $item->getIdentifier()]);
+        $sth = $this->connection->getDbh()->prepare('DELETE FROM products WHERE id = :identifier');
+        $sth->execute([':identifier' => $item->getIdentifier()]);
         return $this;
     }
 
-    public function softDelete(Query $query): self {
+    public function softDelete(ItemInterface $item): self {
+        $query = 'UPDATE products SET deleted = 1 WHERE id = :identifier';
+        $sth = $this->connection->getDbh()->prepare($query);
+        $sth->execute([':identifier' => $item->getIdentifier()]);
         return $this;
     }
 
-    public function search(Query $query): array {
+    public function search(): array {
         return [];
     }
 
@@ -245,6 +288,20 @@ class Item implements ItemMapperInterface {
             $sth = $this->connection->getDbh()->prepare($query);
             $sth->execute($binders);
         }
+        return $this;
+    }
+
+    private function clear(ItemInterface $item): self {
+        $sth = $this->connection->getDbh()->prepare('UPDATE products_attr_text SET deleted = 1 WHERE productid = :identifier');
+        $sth->execute([':identifier' => $item->getIdentifier()]);
+        $sth = $this->connection->getDbh()->prepare('UPDATE products_categories SET deleted = 1 WHERE productid = :identifier');
+        $sth->execute([':identifier' => $item->getIdentifier()]);
+        $sth = $this->connection->getDbh()->prepare('UPDATE products_images SET deleted = 1 WHERE productid = :identifier');
+        $sth->execute([':identifier' => $item->getIdentifier()]);
+        $sth = $this->connection->getDbh()->prepare('UPDATE stocks SET deleted = 1 WHERE productid = :identifier');
+        $sth->execute([':identifier' => $item->getIdentifier()]);
+        $sth = $this->connection->getDbh()->prepare('UPDATE prices SET deleted = 1 WHERE productid = :identifier');
+        $sth->execute([':identifier' => $item->getIdentifier()]);
         return $this;
     }
 }

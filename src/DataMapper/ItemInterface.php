@@ -6,6 +6,6 @@ interface ItemInterface {
     public function create(Subject $item): self;
     public function read(int $identifier): Subject;
     public function update(Subject $item): self;
-    public function delete(Query $query): self;
-    public function search(Query $query);
+    public function delete(Subject $item): self;
+    public function search();
 }
