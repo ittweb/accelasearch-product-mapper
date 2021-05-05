@@ -9,27 +9,27 @@ use \Ittweb\AccelaSearch\ProductMapper\DataMapper\ItemInterface as ItemMapperInt
 class Item implements ItemMapperInterface {
     private $connection;
     private $attribute_lookup;
+    private $item_reader;
     private $item_get_type;
     private $item_is_product;
     private $item_get_children;
     private $quantity_converter;
-    private $item_reader;
 
     public function __construct(
         Connection $connection,
+        ItemReader $item_reader,
         ItemGetTypeVisitor $item_get_type,
         ItemIsProductVisitor $item_is_product,
         ItemGetChildrenVisitor $item_get_children,
-        QuantityConverterVisitor $quantity_converter,
-        ItemReader $item_reader
+        QuantityConverterVisitor $quantity_converter
     ) {
         $this->connection = $connection;
+        $this->item_reader = $item_reader;
         $this->item_get_type = $item_get_type;
         $this->item_is_product = $item_is_product;
         $this->attribute_lookup = [];
         $this->item_get_children = $item_get_children;
         $this->quantity_converter = $quantity_converter;
-        $this->item_reader = $item_reader;
 
         $this->initializeAttributeLookup();
     }
@@ -37,11 +37,11 @@ class Item implements ItemMapperInterface {
     public static function fromConnection(Connection $connection): self {
         return new Item(
             $connection,
+            ItemReader::fromConnection($connection),
             new ItemGetTypeVisitor(),
             new ItemIsProductVisitor(),
             new ItemGetChildrenVisitor(),
-            new QuantityConverterVisitor(),
-            ItemReader::fromConnection($connection)
+            new QuantityConverterVisitor()
         );
     }
 

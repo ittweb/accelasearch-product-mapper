@@ -21,6 +21,7 @@ class ItemReader {
     private $product_factory;
     private $category_mapper;
     private $warehouse_mapper;
+    private $group_mapper;
     private $category_lookup;
     private $warehouse_lookup;
     private $group_lookup;
