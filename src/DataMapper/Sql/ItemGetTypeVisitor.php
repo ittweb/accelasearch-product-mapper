@@ -20,6 +20,7 @@ class ItemGetTypeVisitor implements VisitorInterface {
     public const DOWNLOADABLE = 61;
     public const CONFIGURABLE = 30;
     public const BUNDLE = 40;
+    public const GROUPED = 20;
 
     public function visitBanner(Banner $item) {
         return self::BANNER;

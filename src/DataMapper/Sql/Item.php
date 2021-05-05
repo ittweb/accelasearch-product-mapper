@@ -5,7 +5,6 @@ use \Ittweb\AccelaSearch\ProductMapper\ProductInterface;
 use \Ittweb\AccelaSearch\ProductMapper\StockableInterface;
 use \Ittweb\AccelaSearch\ProductMapper\SellableInterface;
 use \Ittweb\AccelaSearch\ProductMapper\DataMapper\ItemInterface as ItemMapperInterface;
-use \Ittweb\AccelaSearch\ProductMapper\DataMapper\Query;
 
 class Item implements ItemMapperInterface {
     private $connection;
@@ -14,13 +13,15 @@ class Item implements ItemMapperInterface {
     private $item_is_product;
     private $item_get_children;
     private $quantity_converter;
+    private $item_reader;
 
     public function __construct(
         Connection $connection,
         ItemGetTypeVisitor $item_get_type,
         ItemIsProductVisitor $item_is_product,
         ItemGetChildrenVisitor $item_get_children,
-        QuantityConverterVisitor $quantity_converter
+        QuantityConverterVisitor $quantity_converter,
+        ItemReader $item_reader
     ) {
         $this->connection = $connection;
         $this->item_get_type = $item_get_type;
@@ -28,6 +29,7 @@ class Item implements ItemMapperInterface {
         $this->attribute_lookup = [];
         $this->item_get_children = $item_get_children;
         $this->quantity_converter = $quantity_converter;
+        $this->item_reader = $item_reader;
 
         $this->initializeAttributeLookup();
     }
@@ -38,7 +40,8 @@ class Item implements ItemMapperInterface {
             new ItemGetTypeVisitor(),
             new ItemIsProductVisitor(),
             new ItemGetChildrenVisitor(),
-            new QuantityConverterVisitor()
+            new QuantityConverterVisitor(),
+            ItemReader::fromConnection($connection)
         );
     }
 
@@ -84,7 +87,7 @@ class Item implements ItemMapperInterface {
     }
 
     public function read(int $identifier): ItemInterface {
-        return new \Ittweb\AccelaSearch\ProductMapper\Page('...');
+        return $this->item_reader->read($identifier);
     }
 
     public function update(ItemInterface $item): self {
@@ -119,7 +122,7 @@ class Item implements ItemMapperInterface {
     }
 
     public function search(): array {
-        return [];
+        return $this->item_reader->search();
     }
 
     private function initializeAttributeLookup(): self {

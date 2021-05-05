@@ -47,6 +47,12 @@ trait ProductTrait {
         return array_values($this->attributes);
     }
 
+    public function getAttribute(string $name): ?Attribute {
+        return isset($this->attributes[$name])
+            ? $this->attributes[$name]
+            : null;
+    }
+
     public function addAttribute(Attribute $attribute): self {
         $this->attributes[$attribute->getName()] = $attribute;
         return $this;

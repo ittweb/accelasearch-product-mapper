@@ -14,7 +14,7 @@ class Simple implements ProductInterface {
         ImageInfo $image_info
     ) {
         $this->identifier = null;
-        $this->sky = null;
+        $this->sku = null;
         $this->url = $url;
         $this->availability = $availability;
         $this->pricing = $pricing;
