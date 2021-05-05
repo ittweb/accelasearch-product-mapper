@@ -132,7 +132,14 @@ class ItemReader {
     }
 
     private function searchChildrenByIdentifier(int $identifier): array {
-        return [];
+        $query = 'SELECT productid FROM products_children WHERE parentid = :identifier AND deleted = 0';
+        $sth = $this->connection->getDbh()->prepare($query);
+        $sth->execute([':identifier' => $identifier]);
+        $children = [];
+        while ($row = $sth->fetch()) {
+            $children[] = $this->read($row['productid']);
+        }
+        return $children;
     }
 
     private function buildProduct(ProductInterface $item): self {
