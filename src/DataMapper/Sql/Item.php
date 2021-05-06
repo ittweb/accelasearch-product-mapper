@@ -58,7 +58,10 @@ class Item implements ItemMapperInterface {
             ':external_identifier' => $item->accept($this->item_is_product) ? $item->getExternalIdentifier() : null,
             ':url' => $item->getUrl()
         ]);
-        $item->setIdentifier($this->connection->getDbh()->lastInsertId());
+        $id = $this->connection->getDbh()->lastInsertId();
+        if (!empty($id)) {
+            $item->setIdentifier($id);
+        }
 
         // Inserts additional information
         if ($item->accept($this->item_is_product)) {
