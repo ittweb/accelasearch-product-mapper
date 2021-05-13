@@ -1,15 +1,17 @@
 <?php declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
-use \Ittweb\AccelaSearch\ProductMapper\Model\Simple;
-use \Ittweb\AccelaSearch\ProductMapper\Model\Price\MultiGroupPrice;
-use \Ittweb\AccelaSearch\ProductMapper\Model\Stock\StockInfo;
+use \Ittweb\AccelaSearch\ProductMapper\Simple;
+use \Ittweb\AccelaSearch\ProductMapper\Stock\Availability;
+use \Ittweb\AccelaSearch\ProductMapper\Price\Pricing;
+use \Ittweb\AccelaSearch\ProductMapper\ImageInfo;
 
 final class SimpleTest extends TestCase {
-    public function testAsArray() {
-        $stock = new StockInfo();
-        $price = new MultiGroupPrice();
-        $item = new Simple($stock, $price);
-        $item->url = 'https://www.site.com';
-        $this->assertEquals(['header' => ['type' => 'simple'], 'data' => ['url' => 'https://www.site.com'], 'configurable_attributes' => [], 'warehouses' => [], 'pricing' => []], $item->asArray());
+    public function testDefaultIsActive() {
+        $product = $this->create();
+        $this->assertEquals('url', $product->getUrl());
+    }
+
+    private function create(): Simple {
+        return new Simple('url', 'id', new Availability(), new Pricing(), new ImageInfo());
     }
 }
