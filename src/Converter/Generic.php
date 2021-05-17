@@ -1,5 +1,5 @@
 <?php
-namespace Ittweb\AccelaSearch\ProductMapper\Converter;
+namespace AccelaSearch\ProductMapper\Converter;
 
 class Generic {
     private $converter_a;

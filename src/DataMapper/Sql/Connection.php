@@ -1,8 +1,8 @@
 <?php
-namespace Ittweb\AccelaSearch\ProductMapper\DataMapper\Sql;
+namespace AccelaSearch\ProductMapper\DataMapper\Sql;
 use \PDO;
-use \Ittweb\AccelaSearch\ProductMapper\Shop;
-use \Ittweb\AccelaSearch\ProductMapper\Collector;
+use \AccelaSearch\ProductMapper\Shop;
+use \AccelaSearch\ProductMapper\Collector;
 
 class Connection {
     private $dbh;

@@ -2,15 +2,15 @@
 /**
  * @todo This class is not fully implemented
  */
-namespace Ittweb\AccelaSearch\ProductMapper\Converter\Dictionary;
+namespace AccelaSearch\ProductMapper\Converter\Dictionary;
 use \BadFunctionCallException;
 use \InvalidArgumentException;
-use \Ittweb\AccelaSearch\ProductMapper\Converter\ItemInterface;
-use \Ittweb\AccelaSearch\ProductMapper\ItemInterface as Subject;
-use \Ittweb\AccelaSearch\ProductMapper\Banner;
-use \Ittweb\AccelaSearch\ProductMapper\Page;
-use \Ittweb\AccelaSearch\ProductMapper\CategoryPage;
-use \Ittweb\AccelaSearch\ProductMapper\ProductFactory;
+use \AccelaSearch\ProductMapper\Converter\ItemInterface;
+use \AccelaSearch\ProductMapper\ItemInterface as Subject;
+use \AccelaSearch\ProductMapper\Banner;
+use \AccelaSearch\ProductMapper\Page;
+use \AccelaSearch\ProductMapper\CategoryPage;
+use \AccelaSearch\ProductMapper\ProductFactory;
 
 class Item implements ItemInterface {
     private $visitor;

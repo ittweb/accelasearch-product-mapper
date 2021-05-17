@@ -1,20 +1,20 @@
 <?php
-namespace Ittweb\AccelaSearch\ProductMapper\DataMapper\Sql;
+namespace AccelaSearch\ProductMapper\DataMapper\Sql;
 use \OutOfBoundsException;
 use \InvalidArgumentException;
-use \Ittweb\AccelaSearch\ProductMapper\ItemInterface;
-use \Ittweb\AccelaSearch\ProductMapper\Banner;
-use \Ittweb\AccelaSearch\ProductMapper\Page;
-use \Ittweb\AccelaSearch\ProductMapper\CategoryPage;
-use \Ittweb\AccelaSearch\ProductMapper\StockableInterface;
-use \Ittweb\AccelaSearch\ProductMapper\SellableInterface;
-use \Ittweb\AccelaSearch\ProductMapper\ProductInterface;
-use \Ittweb\AccelaSearch\ProductMapper\ProductFactory;
-use \Ittweb\AccelaSearch\ProductMapper\Attribute;
-use \Ittweb\AccelaSearch\ProductMapper\Stock\Stock;
-use \Ittweb\AccelaSearch\ProductMapper\Stock\Quantity\Limited;
-use \Ittweb\AccelaSearch\ProductMapper\Stock\Quantity\Unlimited;
-use \Ittweb\AccelaSearch\ProductMapper\Price\Price;
+use \AccelaSearch\ProductMapper\ItemInterface;
+use \AccelaSearch\ProductMapper\Banner;
+use \AccelaSearch\ProductMapper\Page;
+use \AccelaSearch\ProductMapper\CategoryPage;
+use \AccelaSearch\ProductMapper\StockableInterface;
+use \AccelaSearch\ProductMapper\SellableInterface;
+use \AccelaSearch\ProductMapper\ProductInterface;
+use \AccelaSearch\ProductMapper\ProductFactory;
+use \AccelaSearch\ProductMapper\Attribute;
+use \AccelaSearch\ProductMapper\Stock\Stock;
+use \AccelaSearch\ProductMapper\Stock\Quantity\Limited;
+use \AccelaSearch\ProductMapper\Stock\Quantity\Unlimited;
+use \AccelaSearch\ProductMapper\Price\Price;
 
 class ItemReader {
     private $connection;
@@ -66,6 +66,20 @@ class ItemReader {
 
     public function search(): array {
         return [];
+    }
+
+    public function searchByExternalIdentifier(string $external_identifier): ItemInterface {
+        $query = 'SELECT id, sku, typeid, externalidstr, url FROM products WHERE externalidstr = :external_identifier AND siteid = :shop_identifier';
+        $sth = $this->connection->getDbh()->prepare($query);
+        $sth->execute([
+            ':external_identifier' => $external_identifier,
+            ':shop_identifier' => $this->connection->getShopIdentifier()
+        ]);
+        $row = $sth->fetch();
+        if (empty($row)) {
+            throw new OutOfBoundsException('No item with identifier ' . $external_identifier . '.');
+        }
+        return $this->rowToItem($row);
     }
 
     private function rowToItem(array $row): ItemInterface {

@@ -1,6 +1,6 @@
 <?php
-namespace Ittweb\AccelaSearch\ProductMapper\Repository;
-use \Ittweb\AccelaSearch\ProductMapper\Category as Subject;
+namespace AccelaSearch\ProductMapper\Repository;
+use \AccelaSearch\ProductMapper\Category as Subject;
 
 interface CategoryInterface {
     public function insert(Subject $category): self;

@@ -1,6 +1,6 @@
 <?php
-namespace Ittweb\AccelaSearch\ProductMapper\Repository;
-use \Ittweb\AccelaSearch\ProductMapper\Stock\Warehouse\WarehouseInterface as Subject;
+namespace AccelaSearch\ProductMapper\Repository;
+use \AccelaSearch\ProductMapper\Stock\Warehouse\WarehouseInterface as Subject;
 
 interface WarehouseInterface {
     public function insert(Subject $warehouse): self;

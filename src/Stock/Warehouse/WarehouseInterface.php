@@ -1,5 +1,5 @@
 <?php
-namespace Ittweb\AccelaSearch\ProductMapper\Stock\Warehouse;
+namespace AccelaSearch\ProductMapper\Stock\Warehouse;
 
 interface WarehouseInterface {
     public function getIdentifier(): ?int;

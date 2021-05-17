@@ -1,9 +1,9 @@
 <?php
-namespace Ittweb\AccelaSearch\ProductMapper\DataMapper\Sql;
+namespace AccelaSearch\ProductMapper\DataMapper\Sql;
 use \OutOfBoundsException;
-use \Ittweb\AccelaSearch\ProductMapper\Stock\Warehouse\WarehouseInterface as Subject;
-use \Ittweb\AccelaSearch\ProductMapper\Stock\Warehouse\Physical;
-use \Ittweb\AccelaSearch\ProductMapper\Stock\Warehouse\Virtual;
+use \AccelaSearch\ProductMapper\Stock\Warehouse\WarehouseInterface as Subject;
+use \AccelaSearch\ProductMapper\Stock\Warehouse\Physical;
+use \AccelaSearch\ProductMapper\Stock\Warehouse\Virtual;
 
 class Warehouse {
     private $connection;

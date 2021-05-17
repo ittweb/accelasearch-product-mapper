@@ -1,10 +1,10 @@
 <?php
-namespace Ittweb\AccelaSearch\ProductMapper\Repository\Sql;
+namespace AccelaSearch\ProductMapper\Repository\Sql;
 use \OutOfBoundsException;
-use \Ittweb\AccelaSearch\ProductMapper\Category as Subject;
-use \Ittweb\AccelaSearch\ProductMapper\Repository\CategoryInterface;
-use \Ittweb\AccelaSearch\ProductMapper\DataMapper\Sql\Connection;
-use \Ittweb\AccelaSearch\ProductMapper\DataMapper\Sql\Category as DataMapper;
+use \AccelaSearch\ProductMapper\Category as Subject;
+use \AccelaSearch\ProductMapper\Repository\CategoryInterface;
+use \AccelaSearch\ProductMapper\DataMapper\Sql\Connection;
+use \AccelaSearch\ProductMapper\DataMapper\Sql\Category as DataMapper;
 
 class Category {
     private $mapper;

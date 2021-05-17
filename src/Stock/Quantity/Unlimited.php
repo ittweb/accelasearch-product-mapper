@@ -1,5 +1,5 @@
 <?php
-namespace Ittweb\AccelaSearch\ProductMapper\Stock\Quantity;
+namespace AccelaSearch\ProductMapper\Stock\Quantity;
 
 class Unlimited implements QuantityInterface {
     public function accept(VisitorInterface $visitor) {

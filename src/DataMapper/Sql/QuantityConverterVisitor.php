@@ -1,8 +1,8 @@
 <?php
-namespace Ittweb\AccelaSearch\ProductMapper\DataMapper\Sql;
-use \Ittweb\AccelaSearch\ProductMapper\Stock\Quantity\VisitorInterface;
-use \Ittweb\AccelaSearch\ProductMapper\Stock\Quantity\Limited;
-use \Ittweb\AccelaSearch\ProductMapper\Stock\Quantity\Unlimited;
+namespace AccelaSearch\ProductMapper\DataMapper\Sql;
+use \AccelaSearch\ProductMapper\Stock\Quantity\VisitorInterface;
+use \AccelaSearch\ProductMapper\Stock\Quantity\Limited;
+use \AccelaSearch\ProductMapper\Stock\Quantity\Unlimited;
 
 class QuantityConverterVisitor implements VisitorInterface {
     public function visitLimited(Limited $quantity) {

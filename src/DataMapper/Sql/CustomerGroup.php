@@ -1,7 +1,7 @@
 <?php
-namespace Ittweb\AccelaSearch\ProductMapper\DataMapper\Sql;
+namespace AccelaSearch\ProductMapper\DataMapper\Sql;
 use \OutOfBoundsException;
-use \Ittweb\AccelaSearch\ProductMapper\Price\CustomerGroup as Subject;
+use \AccelaSearch\ProductMapper\Price\CustomerGroup as Subject;
 
 class CustomerGroup {
     private $connection;

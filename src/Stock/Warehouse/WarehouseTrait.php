@@ -1,5 +1,5 @@
 <?php
-namespace Ittweb\AccelaSearch\ProductMapper\Stock\Warehouse;
+namespace AccelaSearch\ProductMapper\Stock\Warehouse;
 
 trait WarehouseTrait {
     private $identifier;

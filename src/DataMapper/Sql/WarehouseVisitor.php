@@ -1,8 +1,8 @@
 <?php
-namespace Ittweb\AccelaSearch\ProductMapper\DataMapper\Sql;
-use \Ittweb\AccelaSearch\ProductMapper\Stock\Warehouse\VisitorInterface;
-use \Ittweb\AccelaSearch\ProductMapper\Stock\Warehouse\Physical;
-use \Ittweb\AccelaSearch\ProductMapper\Stock\Warehouse\Virtual;
+namespace AccelaSearch\ProductMapper\DataMapper\Sql;
+use \AccelaSearch\ProductMapper\Stock\Warehouse\VisitorInterface;
+use \AccelaSearch\ProductMapper\Stock\Warehouse\Physical;
+use \AccelaSearch\ProductMapper\Stock\Warehouse\Virtual;
 
 class WarehouseVisitor implements VisitorInterface {
     public function visitPhysical(Physical $warehouse) {

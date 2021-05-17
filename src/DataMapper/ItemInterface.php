@@ -1,6 +1,6 @@
 <?php
-namespace Ittweb\AccelaSearch\ProductMapper\DataMapper;
-use \Ittweb\AccelaSearch\ProductMapper\ItemInterface as Subject;
+namespace AccelaSearch\ProductMapper\DataMapper;
+use \AccelaSearch\ProductMapper\ItemInterface as Subject;
 
 interface ItemInterface {
     public function create(Subject $item): self;

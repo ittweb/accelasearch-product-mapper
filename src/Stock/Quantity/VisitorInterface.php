@@ -1,5 +1,5 @@
 <?php
-namespace Ittweb\AccelaSearch\ProductMapper\Stock\Quantity;
+namespace AccelaSearch\ProductMapper\Stock\Quantity;
 
 interface VisitorInterface {
     public function visitLimited(Limited $quantity);

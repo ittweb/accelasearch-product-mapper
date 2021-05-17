@@ -1,9 +1,9 @@
 <?php
-namespace Ittweb\AccelaSearch\ProductMapper\Repository\Memory;
+namespace AccelaSearch\ProductMapper\Repository\Memory;
 use \OutOfBoundsException;
 use \BadFunctionCallException;
-use \Ittweb\AccelaSearch\ProductMapper\Category as Subject;
-use \Ittweb\AccelaSearch\ProductMapper\Repository\CategoryInterface;
+use \AccelaSearch\ProductMapper\Category as Subject;
+use \AccelaSearch\ProductMapper\Repository\CategoryInterface;
 
 class Category {
     private $categories;

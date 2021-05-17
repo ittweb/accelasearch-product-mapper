@@ -1,9 +1,9 @@
 <?php
-namespace Ittweb\AccelaSearch\ProductMapper\DataMapper\Sql;
+namespace AccelaSearch\ProductMapper\DataMapper\Sql;
 use \PDO;
 use \OutOfBoundsException;
-use \Ittweb\AccelaSearch\ProductMapper\Shop as Subject;
-use \Ittweb\AccelaSearch\ProductMapper\Cms;
+use \AccelaSearch\ProductMapper\Shop as Subject;
+use \AccelaSearch\ProductMapper\Cms;
 
 class Shop {
     private $dbh;

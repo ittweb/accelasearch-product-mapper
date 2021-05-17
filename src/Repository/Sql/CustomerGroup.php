@@ -1,10 +1,10 @@
 <?php
-namespace Ittweb\AccelaSearch\ProductMapper\Repository\Sql;
+namespace AccelaSearch\ProductMapper\Repository\Sql;
 use \OutOfBoundsException;
-use \Ittweb\AccelaSearch\ProductMapper\Price\CustomerGroup as Subject;
-use \Ittweb\AccelaSearch\ProductMapper\Repository\CustomerGroupInterface;
-use \Ittweb\AccelaSearch\ProductMapper\DataMapper\Sql\Connection;
-use \Ittweb\AccelaSearch\ProductMapper\DataMapper\Sql\CustomerGroup as DataMapper;
+use \AccelaSearch\ProductMapper\Price\CustomerGroup as Subject;
+use \AccelaSearch\ProductMapper\Repository\CustomerGroupInterface;
+use \AccelaSearch\ProductMapper\DataMapper\Sql\Connection;
+use \AccelaSearch\ProductMapper\DataMapper\Sql\CustomerGroup as DataMapper;
 
 class CustomerGroup {
     private $mapper;
