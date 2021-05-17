@@ -1,5 +1,5 @@
 <?php
-namespace Ittweb\AccelaSearch\ProductMapper\Price;
+namespace AccelaSearch\ProductMapper\Price;
 
 class Pricing {
     private $prices;

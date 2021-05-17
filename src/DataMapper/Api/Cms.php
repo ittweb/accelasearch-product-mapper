@@ -1,6 +1,6 @@
 <?php
-namespace Ittweb\AccelaSearch\ProductMapper\DataMapper\Api;
-use \Ittweb\AccelaSearch\ProductMapper\Cms as Subject;
+namespace AccelaSearch\ProductMapper\DataMapper\Api;
+use \AccelaSearch\ProductMapper\Cms as Subject;
 
 class Cms {
     private $client;

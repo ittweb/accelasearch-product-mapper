@@ -1,5 +1,5 @@
 <?php
-namespace Ittweb\AccelaSearch\ProductMapper\Stock;
+namespace AccelaSearch\ProductMapper\Stock;
 
 class Availability {
     private $stocks;

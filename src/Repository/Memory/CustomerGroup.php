@@ -1,9 +1,9 @@
 <?php
-namespace Ittweb\AccelaSearch\ProductMapper\Repository\Memory;
+namespace AccelaSearch\ProductMapper\Repository\Memory;
 use \OutOfBoundsException;
 use \BadFunctionCallException;
-use \Ittweb\AccelaSearch\ProductMapper\Price\CustomerGroup as Subject;
-use \Ittweb\AccelaSearch\ProductMapper\Repository\CustomerGroupInterface;
+use \AccelaSearch\ProductMapper\Price\CustomerGroup as Subject;
+use \AccelaSearch\ProductMapper\Repository\CustomerGroupInterface;
 
 class CustomerGroup {
     private $groups;

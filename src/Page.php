@@ -1,5 +1,5 @@
 <?php
-namespace Ittweb\AccelaSearch\ProductMapper;
+namespace AccelaSearch\ProductMapper;
 
 class Page implements ItemInterface {
     use ItemTrait;

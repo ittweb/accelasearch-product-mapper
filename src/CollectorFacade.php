@@ -1,14 +1,14 @@
 <?php
-namespace Ittweb\AccelaSearch\ProductMapper;
+namespace AccelaSearch\ProductMapper;
 use \PDO;
 use \PDOException;
-use \Ittweb\AccelaSearch\ProductMapper\DataMapper\Api\Client;
-use \Ittweb\AccelaSearch\ProductMapper\DataMapper\Api\Collector as CollectorMapper;
-use \Ittweb\AccelaSearch\ProductMapper\DataMapper\Sql\Connection;
-use \Ittweb\AccelaSearch\ProductMapper\DataMapper\Sql\Item as ItemMapper;
-use \Ittweb\AccelaSearch\ProductMapper\Repository\Sql\Factory as RepositoryFactory;
-use \Ittweb\AccelaSearch\ProductMapper\DataMapper\Sql\ItemIsProductVisitor;
-use \Ittweb\AccelaSearch\ProductMapper\DataMapper\Sql\ItemGetChildrenVisitor;
+use \AccelaSearch\ProductMapper\DataMapper\Api\Client;
+use \AccelaSearch\ProductMapper\DataMapper\Api\Collector as CollectorMapper;
+use \AccelaSearch\ProductMapper\DataMapper\Sql\Connection;
+use \AccelaSearch\ProductMapper\DataMapper\Sql\Item as ItemMapper;
+use \AccelaSearch\ProductMapper\Repository\Sql\Factory as RepositoryFactory;
+use \AccelaSearch\ProductMapper\DataMapper\Sql\ItemIsProductVisitor;
+use \AccelaSearch\ProductMapper\DataMapper\Sql\ItemGetChildrenVisitor;
 
 class CollectorFacade {
     private $dbh;
@@ -59,6 +59,10 @@ class CollectorFacade {
 
     public function load(int $identifier): ItemInterface {
         return $this->items->read($identifier);
+    }
+
+    public function searchByExternalIdentifier(string $external_identifier): ItemInterface {
+        return $this->items->searchByExternalIdentifier($external_identifier);
     }
 
     public function delete(ItemInterface $item): self {

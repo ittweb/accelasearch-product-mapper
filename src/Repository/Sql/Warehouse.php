@@ -1,10 +1,10 @@
 <?php
-namespace Ittweb\AccelaSearch\ProductMapper\Repository\Sql;
+namespace AccelaSearch\ProductMapper\Repository\Sql;
 use \OutOfBoundsException;
-use \Ittweb\AccelaSearch\ProductMapper\Stock\Warehouse\WarehouseInterface as Subject;
-use \Ittweb\AccelaSearch\ProductMapper\Repository\WarehouseInterface;
-use \Ittweb\AccelaSearch\ProductMapper\DataMapper\Sql\Connection;
-use \Ittweb\AccelaSearch\ProductMapper\DataMapper\Sql\Warehouse as DataMapper;
+use \AccelaSearch\ProductMapper\Stock\Warehouse\WarehouseInterface as Subject;
+use \AccelaSearch\ProductMapper\Repository\WarehouseInterface;
+use \AccelaSearch\ProductMapper\DataMapper\Sql\Connection;
+use \AccelaSearch\ProductMapper\DataMapper\Sql\Warehouse as DataMapper;
 
 class Warehouse {
     private $mapper;

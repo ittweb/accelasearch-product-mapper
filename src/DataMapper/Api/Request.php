@@ -1,5 +1,5 @@
 <?php
-namespace Ittweb\AccelaSearch\ProductMapper\DataMapper\Api;
+namespace AccelaSearch\ProductMapper\DataMapper\Api;
 
 class Request {
     private $path;

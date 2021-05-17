@@ -1,5 +1,5 @@
 <?php
-namespace Ittweb\AccelaSearch\ProductMapper;
+namespace AccelaSearch\ProductMapper;
 
 class Attribute {
     public const DEFAULT_IS_CONFIGURABLE = false;

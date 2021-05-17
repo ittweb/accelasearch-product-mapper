@@ -1,7 +1,7 @@
 <?php
-namespace Ittweb\AccelaSearch\ProductMapper\DataMapper\Api;
+namespace AccelaSearch\ProductMapper\DataMapper\Api;
 use \RuntimeException;
-use \Ittweb\AccelaSearch\ProductMapper\Collector as Subject;
+use \AccelaSearch\ProductMapper\Collector as Subject;
 
 class Collector {
     private $client;

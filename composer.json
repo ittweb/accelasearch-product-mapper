@@ -17,7 +17,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Ittweb\\AccelaSearch\\ProductMapper\\": "src"
+            "AccelaSearch\\ProductMapper\\": "src"
         }
     }
 }

@@ -1,5 +1,5 @@
 <?php
-namespace Ittweb\AccelaSearch\ProductMapper;
+namespace AccelaSearch\ProductMapper;
 
 class Banner implements ItemInterface {
     use ItemTrait;

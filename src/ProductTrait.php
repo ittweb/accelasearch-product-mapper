@@ -1,5 +1,5 @@
 <?php
-namespace Ittweb\AccelaSearch\ProductMapper;
+namespace AccelaSearch\ProductMapper;
 
 trait ProductTrait {
     use ItemTrait;

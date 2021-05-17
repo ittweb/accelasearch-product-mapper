@@ -1,6 +1,6 @@
 <?php
-namespace Ittweb\AccelaSearch\ProductMapper\Repository;
-use \Ittweb\AccelaSearch\ProductMapper\Price\CustomerGroup as Subject;
+namespace AccelaSearch\ProductMapper\Repository;
+use \AccelaSearch\ProductMapper\Price\CustomerGroup as Subject;
 
 interface CustomerGroupInterface {
     public function insert(Subject $group): self;

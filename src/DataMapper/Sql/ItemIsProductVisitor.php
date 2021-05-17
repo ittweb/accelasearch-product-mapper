@@ -1,15 +1,15 @@
 <?php
-namespace Ittweb\AccelaSearch\ProductMapper\DataMapper\Sql;
-use \Ittweb\AccelaSearch\ProductMapper\VisitorInterface;
-use \Ittweb\AccelaSearch\ProductMapper\Banner;
-use \Ittweb\AccelaSearch\ProductMapper\Page;
-use \Ittweb\AccelaSearch\ProductMapper\CategoryPage;
-use \Ittweb\AccelaSearch\ProductMapper\Simple;
-use \Ittweb\AccelaSearch\ProductMapper\Virtual;
-use \Ittweb\AccelaSearch\ProductMapper\Downloadable;
-use \Ittweb\AccelaSearch\ProductMapper\Configurable;
-use \Ittweb\AccelaSearch\ProductMapper\Bundle;
-use \Ittweb\AccelaSearch\ProductMapper\Grouped;
+namespace AccelaSearch\ProductMapper\DataMapper\Sql;
+use \AccelaSearch\ProductMapper\VisitorInterface;
+use \AccelaSearch\ProductMapper\Banner;
+use \AccelaSearch\ProductMapper\Page;
+use \AccelaSearch\ProductMapper\CategoryPage;
+use \AccelaSearch\ProductMapper\Simple;
+use \AccelaSearch\ProductMapper\Virtual;
+use \AccelaSearch\ProductMapper\Downloadable;
+use \AccelaSearch\ProductMapper\Configurable;
+use \AccelaSearch\ProductMapper\Bundle;
+use \AccelaSearch\ProductMapper\Grouped;
 
 class ItemIsProductVisitor implements VisitorInterface {
     public function visitBanner(Banner $item) {

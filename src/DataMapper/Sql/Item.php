@@ -1,10 +1,10 @@
 <?php
-namespace Ittweb\AccelaSearch\ProductMapper\DataMapper\Sql;
-use \Ittweb\AccelaSearch\ProductMapper\ItemInterface;
-use \Ittweb\AccelaSearch\ProductMapper\ProductInterface;
-use \Ittweb\AccelaSearch\ProductMapper\StockableInterface;
-use \Ittweb\AccelaSearch\ProductMapper\SellableInterface;
-use \Ittweb\AccelaSearch\ProductMapper\DataMapper\ItemInterface as ItemMapperInterface;
+namespace AccelaSearch\ProductMapper\DataMapper\Sql;
+use \AccelaSearch\ProductMapper\ItemInterface;
+use \AccelaSearch\ProductMapper\ProductInterface;
+use \AccelaSearch\ProductMapper\StockableInterface;
+use \AccelaSearch\ProductMapper\SellableInterface;
+use \AccelaSearch\ProductMapper\DataMapper\ItemInterface as ItemMapperInterface;
 
 class Item implements ItemMapperInterface {
     private $connection;
@@ -126,6 +126,10 @@ class Item implements ItemMapperInterface {
 
     public function search(): array {
         return $this->item_reader->search();
+    }
+
+    public function searchByExternalIdentifier(string $external_identifier): ItemInterface {
+        return $this->item_reader->searchByExternalIdentifier($external_identifier);
     }
 
     private function initializeAttributeLookup(): self {

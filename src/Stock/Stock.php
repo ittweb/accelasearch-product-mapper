@@ -1,9 +1,9 @@
 <?php
-namespace Ittweb\AccelaSearch\ProductMapper\Stock;
-use \Ittweb\AccelaSearch\ProductMapper\Stock\Warehouse\WarehouseInterface;
-use \Ittweb\AccelaSearch\ProductMapper\Stock\Warehouse\Virtual;
-use \Ittweb\AccelaSearch\ProductMapper\Stock\Quantity\QuantityInterface;
-use \Ittweb\AccelaSearch\ProductMapper\Stock\Quantity\Limited;
+namespace AccelaSearch\ProductMapper\Stock;
+use \AccelaSearch\ProductMapper\Stock\Warehouse\WarehouseInterface;
+use \AccelaSearch\ProductMapper\Stock\Warehouse\Virtual;
+use \AccelaSearch\ProductMapper\Stock\Quantity\QuantityInterface;
+use \AccelaSearch\ProductMapper\Stock\Quantity\Limited;
 
 class Stock {
     private $warehouse;

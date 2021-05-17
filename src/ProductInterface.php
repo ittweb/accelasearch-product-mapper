@@ -1,5 +1,5 @@
 <?php
-namespace Ittweb\AccelaSearch\ProductMapper;
+namespace AccelaSearch\ProductMapper;
 
 interface ProductInterface extends ItemInterface, StockableInterface, SellableInterface {
     public function getExternalIdentifier(): string;

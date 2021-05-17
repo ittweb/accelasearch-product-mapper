@@ -1,6 +1,6 @@
 <?php
-namespace Ittweb\AccelaSearch\ProductMapper\Repository\Sql;
-use \Ittweb\AccelaSearch\ProductMapper\DataMapper\Sql\Connection;
+namespace AccelaSearch\ProductMapper\Repository\Sql;
+use \AccelaSearch\ProductMapper\DataMapper\Sql\Connection;
 
 class Factory {
     private $connection;

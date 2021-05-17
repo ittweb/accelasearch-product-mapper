@@ -31,311 +31,341 @@ git clone https://github.com/ittweb/accelasearch-product-mapper.git
 wget https://github.com/ittweb/accelasearch-product-mapper/archive/master.zip
 ```
 
-## Usage
+## Overview
 
-A valid API key is needed to authenticate the application and retrieve collector database credentials. API key can be obtained after activating an AccelaSearch account. `my-api-key` will be used as an example.
+After registering to AccelaSearch, the system will release an **API key**, such as `my-api-key`, which should be kept secret and stored securely. API key may be used to instantiate a `DataMapper\Api\Client` object, which allows to retrieve information about supported CMSs and collector. The former should be used to create an instance of `Shop`, while the latter should be used to establish an SQL connection towards the collector, which may be used to store information about shops and products. In order to facilitate these operations, AccelaSearch - Product Mapper offers a number of utilities and facades, which represent the preferred way to interact with the collector.
 
-### Product Types
+## Retrieving Information
 
-AccelaSearch supports different types of product (see *AccelaSearch - Custom Integration* for a  comprehensive guide), each one having a direct corresponding model in the Product Mapper abstract data type system. Every type of item implements *ItemInterface*, which allows attributes to be dynamically added and defined without a prior schema. Common e-commerce products also implements *StockableInterface* and *SellableInterface* which allow setting/retrieving information about stock (multi-warehouse, virtual or physical, limited or unlimited quantity) and price (multi customer group, multi tier, multi currency and discerning between listing and selling price).
-
-#### Stock information
-
-Every item must be stored in a *warehouse*, either physical (of which geographical coordinates are known) or virtual (of which coordinates are not relevant). Item can be available in limited quantity, or unlimited. The following example shows how to define a stock information:
+Basic information, such as list of supported CMSs and collector credentials, may be accessed through AccelaSearch's API system by using the `DataMapper\Api\Client` along with the relative data mappers.
 
 ```php
-use \Ittweb\AccelaSearch\ProductMapper\Model\Stock\Limited;
-use \Ittweb\AccelaSearch\ProductMapper\Model\Stock\Unlimited;
-use \Ittweb\AccelaSearch\ProductMapper\Model\Stock\Virtual;
-use \Ittweb\AccelaSearch\ProductMapper\Model\Stock\Physical;
-use \Ittweb\AccelaSearch\ProductMapper\Model\Stock\StockInfro;
+use \AccelaSearch\ProductMapper\DataMapper\Api\Client;
+use \AccelaSearch\ProductMapper\DataMapper\Api\Cms as CmsMapper;
+use \AccelaSearch\ProductMapper\DataMapper\Api\Collector as CollectorMapper;
 
-// Stock information
-$stock = new StockInfo();
+$client = Client::fromApiKey("my-api-key");
+$cms_mapper = new CmsMapper($client);
+$collector_mapper = new CollectorMapper($client);
 
-// Two warehouse are available
-$warehouse_1 = new Virtual('virtual-warehouse');
-$warehouse_2 = new Physical('physical-shop', 45.0, 0.0);  // Latitude and longitude
-
-// Item is available in unlimited quantity in 'virtual-warehouse'
-$quantity = new Unlimited();
-$stock->add($warehouse_1, $quantity);
-
-// Same item is available in limited quantity, 15 units, in 'physical-shop'
-$quantity = new Limited(15.0);
-$stock->add($warehouse_2, $quantity);
+$cms_list = $cms_mapper->search();
+$collector = $collector_mapper->read();
 ```
 
-**Note:** Warehouses' identifies (eg. *virtual-warehouse*, *physical-shop*) must have been previously inserted into the collector database.
+## Connecting to the Collector
 
-#### Price Information
-
-Prices in AccelaSearch are multi group, multi tier, multi currency and support different values for listing and selling. The following example shows how to define a price:
+Once a collector object is obtained (which is likely to happen through `DataMapper\Api\Collector`), it can be used to establish a connection to the collector database:
 
 ```php
-use \Ittweb\AccelaSearch\ProductMapper\Model\Price\Price;
-use \Ittweb\AccelaSearch\ProductMapper\Model\Price\MultiCurrencyPrice;
-use \Ittweb\AccelaSearch\ProductMapper\Model\Price\MultiTierPrice;
-use \Ittweb\AccelaSearch\ProductMapper\Model\Price\MultiGroupPrice;
+use \PDO;
 
-$group_price = new MultiGroupPrice();
-
-// Preparing data for customer group with id 'default'
-$group_default = new MultiTierPrice();
-
-// Preparing data for group 'default', order of 0 items or more
-$zero_or_more = new MultiCurrencyPrice();
-
-// Preparig data for goup 'default', 0 items or more, EUR currency
-$price = new Price(42.0);      // Listing and selling price is 42.00
-$price->setSellingPrice(21.0); // Changes selling price to 21.00
-$zero_or_more->add('EUR', $price);
-
-// Preparig data for goup 'default', 0 items or more, USD currency
-$price = new Price(50.0);      // Listing and selling price is 42.00
-$price->setSellingPrice(25.0); // Changes selling price to 21.00
-$zero_or_more->add('USD', $price);
-
-// Preparing data for group 'default', order of 10 items or more
-$ten_or_more = new MultiCurrencyPrice();
-$price = new Price(35.0);
-$ten_or_more->add('EUR', $price); // Defined for EUR only: USD will pay the full price
-
-// Storing tier data
-$group_default->add(0.0, $zero_or_more);
-$group_default->add(10.0, $ten_or_more);
-
-// Storing data for group 'default'
-$group_price->add('default', $group_default);
-
-// Other group info can be added as needed
-$other_group = new MultiTierPrice();
-// ...
-$group_price->add('other', $other_group);
-```
-
-**Note:** Customer group identifiers must have been previously inserted in the collector database.
-
-#### Simple Product
-
-A simple product can be defined by setting a stock information, a price, and adding attributes needed:
-
-```php
-use Ittweb\AccelaSearch\ProductMapper\Model\Simple;
-
-$stock = new StockInfo();
-$price = new MultiGroupPrice();
-// ... defines stock an price info as in previous examples
-
-$product = new Simple($stock, $price);
-$product->sku = 'P001';
-$product->image = array('http://shop.com/p001/img1.jpg', 'http://shop.com/p001/img2.jpg');
-$product->weight = 0.52;
-
-// Dictionary syntax can be used as well
-$product['name'] = 'Some Skirt';
-$product['height'] = 0.38;
-$product['category'] = 'Fashion/Woman/Skirt';
-```
-
-**Note:** It is not required to actually populate stock and price info. Items without stock data will have an "undefined" stock, which is not the same as a quantity of 0. For instance, filters and searches querying for stock availability will not work on undefined stock, but will on 0 stock. The same applies to price information.
-
-#### Configurable Product
-
-Similar to a simple product, but also support definition of *variants*, also known as *configurations*:
-
-```php
-use Ittweb\AccelaSearch\ProductMapper\Model\Configurable;
-
-$stock = new StockInfo();
-$price = new MultiGroupPrice();
-$product = new Configurable($stock, $price);
-$product->sku = 'P-002';
-
-// Configurations can be added one at a time
-$stock_for_red_variant = new StockInfo();
-$price_for_red_variant = new PriceInfo();
-$red_variant = new Simple();
-$red_variant->sku = 'P-002-red';
-$red_variant->color = 'red';
-$product->addConfiguration($red_variant);
-
-// Blue variant, for the sake of example
-$stock_for_blue_variant = new StockInfo();
-$price_for_blue_variant = new PriceInfo();
-$blue_variant = new Simple();
-$blue_variant->sku = 'P-002-blue';
-$blue_variant->color = 'blue';
-$product->addConfiguration($blue_variant);
-```
-
-**Note:** Configurable products do not need to have variants defined, although this is precisely their purpose.
-
-#### Bundle and Grouped Product
-
-Analogous to a configurable product, bundles and grouped products allow to specify components:
-
-```php
-use Ittweb\AccelaSearch\ProductMapper\Model\Bundle;
-
-$stock = new StockInfo();
-$price = new MultiGroupPrice();
-$bundle = new Bundle($stock, $price);
-$product->sku = 'P-003';
-
-// Components can be added one at a time
-$stock = new StockInfo();
-$price = new PriceInfo();
-$component_1 = new Simple();
-$component_1->sku = 'P-073';
-$product->addComponent($component_1);
-
-// Another component, for the sake of example
-$stock = new StockInfo();
-$price = new PriceInfo();
-$component_2 = new Simple();
-$component_2->sku = 'P-512';
-$product->addComponent($component_2);
-```
-
-**Note:** Bundle and grouped products do not need to have components defined, although this is precisely their purpose.
-
-#### Recursive Types
-
-Products referring other products (such as variants for *Configurable* or components for *Grouped, Bundles*) can accept any instance of an *ItemInterface*. As a consequence, it is possible to nest configurable products as components of bundles and vice-versa, or configurable products within configurable products and so on, allowing arbitrarily complex product data structures.
-
-### Obtaining Collector Database Credential
-
-The SQL item mapper class exposes an utility method to retrieve connection credential from an API key:
-
-```php
-use \Ittweb\AccelaSearch\ProductMapper\Mapper\Sql\Item as ItemMapper;
-
-$api_key = 'my-api-key';
-$credential = ItemMapper::getCredentialFromApiKey($api_key);
-echo json_encode($credential, JSON_PRETTY_PRINT);
-```
-
-which outputs:
-
-```json
-{
-    "name": "collector_42",
-    "username": "user_42",
-    "password": "super-secure-password",
-    "hostname": "collector1.accelasearch.net"
-}
-```
-
-Credential must be used to create a valid instance of a `\PDO` object:
-
-```php
-$dbh = new \PDO(
-    'mysql:dbname=' . $credential['name'] . ';host=' . $credential['hostname'],
-    $credendial['username'],
-    $credendial['password']
+$dbh = new PDO(
+    'mysql:host=' . $collector->getHostName() . ';dbname=' . $collector->getDatabaseName(),
+    $collector->getUsername(),
+    $collector->getPassword(),
+    [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+    ]
 );
 ```
 
-The library requires fetch mode to produce *at least* an associative array, which is compatible with PDO's default settings. Although not required, it is strongly recommend setting PDO's error mode to throw exception:
+## Managing Shops
+
+An SQL connection may be used to instantiate a shop data mapper, which may in turn be used to insert instances of `Shop` into the collector:
 
 ```php
-// Unnecessary with PDO's default settings
-$dbh->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
+use \AccelaSearch\ProductMapper\Shop;
+use \AccelaSearch\ProductMapper\DataMapper\Sql\Shop as ShopMapper;
 
-$dbh->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+// $cms_list = ...
+// $dbh = ...
+$shop_mapper = ShopMapper::fromConnection($dbh);
+$shop = new Shop("http://www.shop.com", "en", $cms_list[0]);
+$shop_mapper->create($shop);
 ```
 
-### Instantiating the SQL Mapper
-
-Instances of the SQL mapper operates *per shop*, hence a valid AccelaSearch shop identifier must be provided (see the *AccelaSearch - Custom Integration* to learn how to retrieve the list of shop identifiers). The name of the attribute used as identifier by the local system or CMS (tipically *id*, *sku*, etc.) must also be provided:
+a unique shop identifier will be created upon insertion, and will be assigned to `$shop`. Such identifier may be used to retrieve the shop from the database and update its information or soft-delete it:
 
 ```php
-use \Ittweb\AccelaSearch\ProductMapper\Mapper\Sql\Item as ItemMapper;
+// Shop has identifier 2
+$shop = $shop_mapper->read(2);
+$shop->setUrl("http://www.new-url.com");
+$shop_mapper->update($shop);
 
-$mapper = new ItemMapper($dbh, 42, 'sku');
+// Soft-deletion
+$shop->setIsActive(false);
+$shop_mapper->update($shop);
 ```
 
-Optionally, if the local system supports configurable attributes or categories, the name of the attributes representing them can be specified by:
+**Note**: shops should not be hard-deleted manually, AccelaSearch will periodically scan the collector and take appropriate actions, eventually removing soft-deleted shops.
+
+## Managing Items
+
+The preferred way to handle item data is through the `CollectorFacade`, which automatically handles SQL transactions and rollbacks, insertion of relational features, implicit handling of insert-versus-update. The `CollectorFacade` requires an instance of `DataMapper\API\Client` and the identifier of the shop on which operate, it will retrieve all of the necessary connection information automatically:
 
 ```php
-$mapper->addCategoryField('category');
-$mapper->addCategoryField('collection');
+use \AccelaSearch\ProductMapper\DataMapper\Api\Client;
+use \AccelaSearch\ProductMapper\CollectorFacade;
 
-$mapper->addConfigurableField('color');
-$mapper->addConfigurableField('size');
+$client = Client::fromApiKey("my-api-key");
+$collector = new CollectorFacade($client, 2);
 ```
 
-The number of names of attributes which can be used for categories and configurable attributes is unbounded, every successive attribute will add up to previous ones (in the example, both *category* and *collection* will be considered as categories). Specifying the same attribute name more than once has the same effect of specifying it just once. Although not relevant in most use-cases, the same attribute can be specified both as a category *and* a configurable attribute. If no category nor configurable fields are selected, every attribute is treated as a simple attribute with no special meaning.
-
-### Inserting and Updating Products
-
-Once a product is defined and the mapper is instantiated, it is possible to write directly to the database:
+`CollectorFacade` offers four methods to interact with products: `load`, `searchByExternalIdentifier`, `save` and `delete`. The latter will perform a soft delete, while `save` will either perform an insertion or update depending on the presence of the item in the collector:
 
 ```php
-$mapper->create($product);
+// Retrieves item with identifier 42
+$item = $collector->load(42);
+
+// Retrieves item having external identifier "ITM0001"
+$item = $collector->searchByExternalIdentifier("ITM0001");
+
+// Updates item information
+$item->setUrl("http://new-shop-url.com/ITM0001");
+$collector->save($item);
+
+// Soft deletion
+$collector->delete($item);
 ```
 
-Updates can be executed in the same way:
+## Item Hierarchy
+
+AccelaSearch supports nine different type of items:
+
+* **Banner**: a banner with URL and image (different between desktop and mobile)
+* **Page**: a generic web page
+* **CategoryPage**: web page of a category or collector
+* **Simple**: standard product
+* **Virtual**: subtype of Simple, usually implies no shipping
+* **Downloadable**: subtype of Virtual, an item which can be downloaded
+* **Configurable**: an item for which a set of variants exists, for example a shirt available in different colors or sizes; variants are usually represented as Simple items, although it is possible to use any type of item
+* **Bundle**: a bundle of items sold together
+* **Grouped**: similar to Bundle, used by CMSs which make a distinction such as Magento
+
+every type of item is represented by an homonym class under the main `\AccelaSearch\ProductMapper`. Every class implements the `ItemInterface`, while `Simple`, `Virtual`, `Downloadable`, `Configurable`, `Bundle` and `Grouped` also implements the `ProductInterface`, which adds information about external identifier, belonging to zero or more categories, image information, custom attributes and information about availability and pricing (by extending the `StockableInterface` and `SellableInterface`).
+
+Although items can be created through constructors, products implementing the `ProductInterface` can be instantiated through the `ProductFactory`:
 
 ```php
-$mapper->update($product);
+use \AccelaSearch\ProductMapper\ProductFactory;
+
+$factory = new ProductFactory();
+$simple = $factory->createSimple("http://myshop.com/SIMPLE0001", "SIMPLE0001");
+$virtual = $factory->createVirtual("http://myshop.com/VIRTUAL0001", "VIRTUAL0001");
+$downloadable = $factory->createDownloadable("http://myshop.com/DOWNLOADABLE0001", "DOWNLOADABLE0001");
+$configurable = $factory->createConfigurable("http://myshop.com/CONF0001", "CONF0001");
+$bundle = $factory->createBundle("http://myshop.com/BUNDLE0001", "BUNDLE0001");
+$grouped = $factory->createVirtual("http://myshop.com/GROUP0001", "GROUP0001");
 ```
 
-While a creation is guaranteed to work (duplicated products are allowed, hence no warning are produced, nor exceptions thrown), updates may silently fail if no products match the *identifier attribute* of given product. If at least one matching product exist, however, they will be all updated at the same time.
+Every method is named after the type of product it creates, and accepts the URL of the product along with its external identifier. Every product is created with empty availability, pricing and image information, and with no categories.
 
-### Deleting Products
+### Adding Standard Attributes
 
-To (soft) delete a product it is sufficient to pass its CMS identifier to the delete method of the mapper:
+Every item allows to set sku and URL through accessors, while products also allow for external identifier, categories, image information, stock availability, pricing and custom attributes. The former can be accessed as:
 
 ```php
-$mapper->delete('P-001');
+// $item = ...
+$item->setSku("ITM-003");
+$item->setUrl("http://www.myshop.com/catalogue/itm-003");
+echo $item->getSku() . " " . $item->getUrl();
+
+// $product = ...
+$product->setExternalIdentifier("56");
+echo $product->getExternalIdentifier();
 ```
 
-every product sharing the same identifier will be marked for soft deletion. Users are not allowed to perform hard deletion.
+Following sections show how to handle more complex standard information.
 
-### Final Notes
+### Adding Categories
 
-Before attempting to change the collector database state, the handshaking phase must be completed as described in the *AccelaSearch - Custom Integration* document.
-
-Users are strongly encouraged to use database transactions when writing data. The following code is paradigmatic for most use-cases:
+Categories must be created (or read from collector) before being assigned to products:
 
 ```php
-$data = read_product_data_from_cms_as_array();
-$products = array_map('your-function-to-convert-from-cms-format-to-ADT', $data);
-$credential = ItemMapper::getCredentialFromApiKey('my-api-key');
-$dbh = new \PDO(
-    'mysql:dbname=' . $credential['name'] . ';host=' . $credential['hostname'],
-    $credendial['username'],
-    $credendial['password']
-);
-$dbh->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-$mapper = new ItemMapper($dbh, 42, 'sku');
+use \AccelaSearch\ProductMapper\Category;
 
-acquire_collector_lock('my-api-key', 42);
-$dbh->beginTransaction();
-try {
-    foreach ($products as $product) {
-        $mapper->create($product);
-    }
-    $dbh->commit();
-} catch (\Exception $e) {
-    $dbh->rollBack();
-}
-release_collector_lock('my-api-key', 42);
+$parent_category = new Category("cat-0001", "Fashion", null);
+$category = new Category("cat-00075", "Woman", $parent_category);
+$category->setUrl("http://www.myshop/categories/75");
+$item->addCategory($category);
+$item->removeCategory($category);
 ```
 
-### Other Formats
+Categories are not explicitly handled by the `CollectorFacade`, which will transparently insert of read data when needed. Instead, categories can be persisted by using the `Repository\Sql\Category` repository or the lower level data mapper `DataMapper\Sql\Category` for raw operations.
 
-The Product Mapper can read/write to JSON using the same format deployed by AccelaSearch for products when returning search results (see *AccelaSearch - Custom Integration* for details), as well as the PHP dictionary format, which is the equivalent form based on PHP arrays:
+### Adding Image Information
+
+Information about pictures of a product are handled by the `ImageInfo` class, which allows to specify a primary (main) image, a secondary (over) image an a list of other images:
 
 ```php
-use \Ittweb\AccelaSearch\ProductMapper\Mapper\Dictionary\Stock as StockDictionary;
-use \Ittweb\AccelaSearch\ProductMapper\Mapper\Dictionary\Price as PriceDictionary;
-use \Ittweb\AccelaSearch\ProductMapper\Mapper\Dictionary\Item as ItemDictionary;
-use \Ittweb\AccelaSearch\ProductMapper\Mapper\Json\DictionaryToJsonAdapter as ItemJson;
+use \AccelaSearch\ProductMapper\ImageInfo;
 
-$dictionary_mapper = new ItemDictionary(new StockDictionary(), new PriceDictionary());
-$json_mapper = new ItemJson($dictionary_mapper);
+$image_info = new ImageInfo();
+$image_info->setMain("http://www.myshop.com/storage/images/001.jpeg")
+    ->setOver("http://www.myshop.com/storage/secondary/001a.jpeg")
+    ->addOther("http://www.myshop.com/storage/secondary/001b.jpeg")
+    ->addOther("http://www.myshop.com/storage/secondary/001c.jpeg")
+    ->addOther("http://www.myshop.com/storage/secondary/001e.jpeg");
 ```
 
+When creating products through the `ProductFactory`, an empty `ImageInfo` is automatically instantiated upon creation, and may be accessed through its accessors methods:
+
+```php
+use \AccelaSearch\ProductMapper\ProductFactory;
+
+$factory = new ProductFactory();
+$item = $factory->createSimple("http://myshop.com/SIMPLE0001", "SIMPLE0001");
+$item->getImageInfo()->setMain("http://myshop.com/storage/images/simple0001.jpeg");
+```
+
+### Adding Availability
+
+Availability is always related to a warehouse, and may be either limited or unlimited. Warehouses must be created (or read from collector) before being used, and can be either virtual or physical (for which latitude and longitude are known). When creating products through the `ProductFactory`, an empty `Stock\Availability` is automatically instantiated upon creation, and may be accessed through its accessors methods:
+
+```php
+use \AccelaSearch\ProductMapper\Stock\Warehouse\Virtual as VirtualWarehouse;
+use \AccelaSearch\ProductMapper\Stock\Warehouse\Physical as PhysicalWarehouse;
+use \AccelaSearch\ProductMapper\Stock\Quantity\Limited as LimitedQuantity;
+use \AccelaSearch\ProductMapper\Stock\Quantity\Unlimited as UnlimitedQuantity;
+
+$generic_warehouse = new VirtualWarehouse("warehouse-001");
+$brick_warehouse = new PhysicalWarehouse("warehouse-002", 45.0, 13.5);
+$five_in_stock = new LimitedQuantity(5);
+$unlimited = new UnlimitedQuantity();
+
+// $item = ...
+$item->getAvailability()->add(new Stock($generic_warehouse, $five_in_stock))
+    ->add(new Stock($brick_warehouse, $unlimited));
+```
+
+Every combination of warehouses and quantity is allowed, each of which is mediated by the `Stock\Stock` class.
+
+### Adding Pricing
+
+Price information is always related to a customer group, to enable different price systems for different groups of user. Moreover, prices may vary depending on the bought quantity (i.e. multi-tier pricing), support multiple currencies and allow to specify a selling price different from the listing price. Customer groups must be created (or read from collector) before being used, while tier, currency and selling and listing prices are standard attribute of the `Price\Price` class. When creating products through the `ProductFactory`, an empty `Price\Pricing` is automatically instantiated, and should be accessed through its accessors methods:
+
+```php
+use \AccelaSearch\ProductMapper\Price\CustomerGroup;
+use \AccelaSearch\ProductMapper\Price\Price;
+
+$group_1 = new CustomerGroup("standard-group");
+$group_2 = new CustomerGroup("webpos-group");
+
+// $item = ...
+// Item normally sold for 19.99 USD, now selling for 15.99, no tiers, only for standard-group
+$item->getPricing()->add(new Price(19.99, 15.99, "USD", 0, $group_1));
+// Same item normally sold for 16.43 EUR, now selling at 13.14 EUR
+$item->getPricing()->add(new Price(19.99, 15.99, "USD", 0, $group_1));
+
+// Item selling at 19.99 USD for quantities between 0 and 9, selling at 9.99 if 100 or more units are bought
+$item->getPricing()->add(new Price(19.99, 19.99, "USD", 0, $group_1))
+    ->add(new Price(9.99, 9.99, "USD", 100, $group_1));
+
+// Same item, but different prices for different customer group, second group gets a discount
+$item->getPricing()->add(new Price(19.99, 19.99, "USD", 0, $group_1))
+    ->add(new Price(25.99, 21.50, "USD", 0, $group_1));
+```
+
+The same combination of currency, minimum quantity and group must not be inserted more than once, otherwise an undefined behavior occurs.
+
+### Adding Custom Attributes
+
+Attributes other than those explicitly handled (URL, sku, prices, availability, etc.) can be inserted as custom attributes. Every custom attribute has a name and a list of values, that is, every attribute is treated as multi-valued. Single-valued must be inserted as multi-valued attributes having a single value. Attributes should be created before being assigned to products:
+
+```php
+use \AccelaSearch\ProductMapper\Attribute;
+
+$name = new Attribute("name");
+$name->addValue("T-Shirt");
+
+$tags = new Attribute("tag");
+$tags->addValue("fashion")->addValue("summer")->addValue("light");
+
+// $item = ...
+$item->addAttribute($name)
+    ->addAttribute($tags);
+```
+
+Once an attribute is defined for a product, it is possible to retrieve it by its name (and possibly modify its list of values):
+
+```php
+$item->getAttribute("tag")->removeValue("light")->addValue("men");
+```
+
+Attribute names should be English words, all lowercase, in singular form (when applicable) and must not contain spaces. We recommend using hyphens or underscore in place of spaces.
+
+For single-valued attribute, a shorthand is available in the form of a factory method:
+
+```php
+$item->addAttribute(Attribute::fromNameAndValue("name", "T-Shirt"));
+```
+
+For products which are part of a configurable, attributes affecting configuration must be flagged as such by setting `isConfigurable` to true:
+
+```php
+$color = new Attribute("color");
+$color->addValue("red");
+$color->setIsConfigurable(true);
+
+// $configurable_item = ...
+// $actual_item = ...
+$actual_item->addAttribute($color);
+```
+
+which is also available in the shorthand:
+
+```php
+$actual_item->addAttribute(Attribute::fromNameAndValue("color", "red")->setIsConfigurable(true));
+```
+
+### Configurable Products
+
+Configurable products are meta-products logically grouping together a set of actual (usually `Simple`) products which differ among each other by small details, such as color or size. When dealing with configurable products, a set of children products must be created and assigned to the parent configurable. Some attributes of the children should be marked as configurable in order to tell AccelaSearch which attributes makes the configuration, and which one do not (as described in previous section):
+
+```php
+use \AccelaSearch\ProductMapper\ProductFactory;
+use \AccelaSearch\ProductMapper\Attribute;
+
+$factory = new ProductFactory();
+$shirt = $factory->createConfigurable("http://www.myshop.com/shirt", "ID:42");
+$shirt->setSku("CONF-001");
+
+$blue_shirt = $factory->createSimple("http://www.myshop.com/shirt/blue", "ID:44");
+$blue_shirt->setSku("CONF-001-b");
+$blue_shirt->addAttribute(Attribute::fromNameAndValue("color", "blue")->setIsConfigurable(true));
+$blue_shirt->addAttribute(Attribute::fromNameAndValue("name", "blue shirt"));
+
+$red_shirt = $factory->createSimple("http://www.myshop.com/shirt/red", "ID:45");
+$red_shirt->setSku("CONF-001-r");
+$red_shirt->addAttribute(Attribute::fromNameAndValue("color", "red")->setIsConfigurable(true));
+$red_shirt->addAttribute(Attribute::fromNameAndValue("name", "red shirt"));
+
+$shirt->addVariant($red_shirt)->addVariant($blue_shirt);
+```
+
+Although not shown in the example, it is recommended to set pricing, availability and category information for both parent and children, as the former does not inherit them from the latter, nor vice-versa.
+
+### Bundle and Grouped Products
+
+Bundle and grouped are meta-products grouping together a set of actual (usually `Simple`) products which are sold together. When dealing with bundle or grouped products, a set of children products must be created and assigned to the parent. A product may appear more than once as child of the same parent, for instance when a set of two identical products is sold together:
+
+```php
+use \AccelaSearch\ProductMapper\ProductFactory;
+use \AccelaSearch\ProductMapper\Attribute;
+
+$factory = new ProductFactory();
+$group = $factory->createGrouped("http://www.myshop.com/group", "ID:48");
+$group->setSku("GRP-009");
+
+$bottle = $factory->createSimple("http://www.myshop.com/bottle", "ID:94");
+$bottle->setSku("BTL-001");
+
+$paper = $factory->createSimple("http://www.myshop.com/paper", "ID:105");
+$bottle->setSku("PPR-001");
+
+// Two bottles and one piece of paper
+$group->addProduct($bottle)->addProduct($bottle)->addProduct($paper);
+```
+
+Although not shown in the example, it is recommended to set pricing, availability and category information for both parent and children, as the former does not inherit them from the latter, nor vice-versa.

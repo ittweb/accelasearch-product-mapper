@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
-use \Ittweb\AccelaSearch\ProductMapper\Cms;
-use \Ittweb\AccelaSearch\ProductMapper\Shop;
+use \AccelaSearch\ProductMapper\Cms;
+use \AccelaSearch\ProductMapper\Shop;
 
 final class ShopTest extends TestCase {
     public function testDefaultIsActive() {

@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
-use \Ittweb\AccelaSearch\ProductMapper\Collector;
+use \AccelaSearch\ProductMapper\Collector;
 
 final class CollectorTest extends TestCase {
     public function testHostName() {
