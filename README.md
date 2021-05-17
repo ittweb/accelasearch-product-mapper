@@ -129,3 +129,243 @@ $collector->save($item);
 $collector->delete($item);
 ```
 
+## Item Hierarchy
+
+AccelaSearch supports nine different type of items:
+
+* **Banner**: a banner with URL and image (different between desktop and mobile)
+* **Page**: a generic web page
+* **CategoryPage**: web page of a category or collector
+* **Simple**: standard product
+* **Virtual**: subtype of Simple, usually implies no shipping
+* **Downloadable**: subtype of Virtual, an item which can be downloaded
+* **Configurable**: an item for which a set of variants exists, for example a shirt available in different colors or sizes; variants are usually represented as Simple items, although it is possible to use any type of item
+* **Bundle**: a bundle of items sold together
+* **Grouped**: similar to Bundle, used by CMSs which make a distinction such as Magento
+
+every type of item is represented by an homonym class under the main `\AccelaSearch\ProductMapper`. Every class implements the `ItemInterface`, while `Simple`, `Virtual`, `Downloadable`, `Configurable`, `Bundle` and `Grouped` also implements the `ProductInterface`, which adds information about external identifier, belonging to zero or more categories, image information, custom attributes and information about availability and pricing (by extending the `StockableInterface` and `SellableInterface`).
+
+Although items can be created through constructors, products implementing the `ProductInterface` can be instantiated through the `ProductFactory`:
+
+```php
+use \AccelaSearch\ProductMapper\ProductFactory;
+
+$factory = new ProductFactory();
+$simple = $factory->createSimple("http://myshop.com/SIMPLE0001", "SIMPLE0001");
+$virtual = $factory->createVirtual("http://myshop.com/VIRTUAL0001", "VIRTUAL0001");
+$downloadable = $factory->createDownloadable("http://myshop.com/DOWNLOADABLE0001", "DOWNLOADABLE0001");
+$configurable = $factory->createConfigurable("http://myshop.com/CONF0001", "CONF0001");
+$bundle = $factory->createBundle("http://myshop.com/BUNDLE0001", "BUNDLE0001");
+$grouped = $factory->createVirtual("http://myshop.com/GROUP0001", "GROUP0001");
+```
+
+Every method is named after the type of product it creates, and accepts the URL of the product along with its external identifier. Every product is created with empty availability, pricing and image information, and with no categories.
+
+### Adding Standard Attributes
+
+Every item allows to set sku and URL through accessors, while products also allow for external identifier, categories, image information, stock availability, pricing and custom attributes. The former can be accessed as:
+
+```php
+// $item = ...
+$item->setSku("ITM-003");
+$item->setUrl("http://www.myshop.com/catalogue/itm-003");
+echo $item->getSku() . " " . $item->getUrl();
+
+// $product = ...
+$product->setExternalIdentifier("56");
+echo $product->getExternalIdentifier();
+```
+
+Following sections show how to handle more complex standard information.
+
+### Adding Categories
+
+Categories must be created (or read from collector) before being assigned to products:
+
+```php
+use \AccelaSearch\ProductMapper\Category;
+
+$parent_category = new Category("cat-0001", "Fashion", null);
+$category = new Category("cat-00075", "Woman", $parent_category);
+$category->setUrl("http://www.myshop/categories/75");
+$item->addCategory($category);
+$item->removeCategory($category);
+```
+
+Categories are not explicitly handled by the `CollectorFacade`, which will transparently insert of read data when needed. Instead, categories can be persisted by using the `Repository\Sql\Category` repository or the lower level data mapper `DataMapper\Sql\Category` for raw operations.
+
+### Adding Image Information
+
+Information about pictures of a product are handled by the `ImageInfo` class, which allows to specify a primary (main) image, a secondary (over) image an a list of other images:
+
+```php
+use \AccelaSearch\ProductMapper\ImageInfo;
+
+$image_info = new ImageInfo();
+$image_info->setMain("http://www.myshop.com/storage/images/001.jpeg")
+    ->setOver("http://www.myshop.com/storage/secondary/001a.jpeg")
+    ->addOther("http://www.myshop.com/storage/secondary/001b.jpeg")
+    ->addOther("http://www.myshop.com/storage/secondary/001c.jpeg")
+    ->addOther("http://www.myshop.com/storage/secondary/001e.jpeg");
+```
+
+When creating products through the `ProductFactory`, an empty `ImageInfo` is automatically instantiated upon creation, and may be accessed through its accessors methods:
+
+```php
+use \AccelaSearch\ProductMapper\ProductFactory;
+
+$factory = new ProductFactory();
+$item = $factory->createSimple("http://myshop.com/SIMPLE0001", "SIMPLE0001");
+$item->getImageInfo()->setMain("http://myshop.com/storage/images/simple0001.jpeg");
+```
+
+### Adding Availability
+
+Availability is always related to a warehouse, and may be either limited or unlimited. Warehouses must be created (or read from collector) before being used, and can be either virtual or physical (for which latitude and longitude are known). When creating products through the `ProductFactory`, an empty `Stock\Availability` is automatically instantiated upon creation, and may be accessed through its accessors methods:
+
+```php
+use \AccelaSearch\ProductMapper\Stock\Warehouse\Virtual as VirtualWarehouse;
+use \AccelaSearch\ProductMapper\Stock\Warehouse\Physical as PhysicalWarehouse;
+use \AccelaSearch\ProductMapper\Stock\Quantity\Limited as LimitedQuantity;
+use \AccelaSearch\ProductMapper\Stock\Quantity\Unlimited as UnlimitedQuantity;
+
+$generic_warehouse = new VirtualWarehouse("warehouse-001");
+$brick_warehouse = new PhysicalWarehouse("warehouse-002", 45.0, 13.5);
+$five_in_stock = new LimitedQuantity(5);
+$unlimited = new UnlimitedQuantity();
+
+// $item = ...
+$item->getAvailability()->add(new Stock($generic_warehouse, $five_in_stock))
+    ->add(new Stock($brick_warehouse, $unlimited));
+```
+
+Every combination of warehouses and quantity is allowed, each of which is mediated by the `Stock\Stock` class.
+
+### Adding Pricing
+
+Price information is always related to a customer group, to enable different price systems for different groups of user. Moreover, prices may vary depending on the bought quantity (i.e. multi-tier pricing), support multiple currencies and allow to specify a selling price different from the listing price. Customer groups must be created (or read from collector) before being used, while tier, currency and selling and listing prices are standard attribute of the `Price\Price` class. When creating products through the `ProductFactory`, an empty `Price\Pricing` is automatically instantiated, and should be accessed through its accessors methods:
+
+```php
+use \AccelaSearch\ProductMapper\Price\CustomerGroup;
+use \AccelaSearch\ProductMapper\Price\Price;
+
+$group_1 = new CustomerGroup("standard-group");
+$group_2 = new CustomerGroup("webpos-group");
+
+// $item = ...
+// Item normally sold for 19.99 USD, now selling for 15.99, no tiers, only for standard-group
+$item->getPricing()->add(new Price(19.99, 15.99, "USD", 0, $group_1));
+// Same item normally sold for 16.43 EUR, now selling at 13.14 EUR
+$item->getPricing()->add(new Price(19.99, 15.99, "USD", 0, $group_1));
+
+// Item selling at 19.99 USD for quantities between 0 and 9, selling at 9.99 if 100 or more units are bought
+$item->getPricing()->add(new Price(19.99, 19.99, "USD", 0, $group_1))
+    ->add(new Price(9.99, 9.99, "USD", 100, $group_1));
+
+// Same item, but different prices for different customer group, second group gets a discount
+$item->getPricing()->add(new Price(19.99, 19.99, "USD", 0, $group_1))
+    ->add(new Price(25.99, 21.50, "USD", 0, $group_1));
+```
+
+The same combination of currency, minimum quantity and group must not be inserted more than once, otherwise an undefined behavior occurs.
+
+### Adding Custom Attributes
+
+Attributes other than those explicitly handled (URL, sku, prices, availability, etc.) can be inserted as custom attributes. Every custom attribute has a name and a list of values, that is, every attribute is treated as multi-valued. Single-valued must be inserted as multi-valued attributes having a single value. Attributes should be created before being assigned to products:
+
+```php
+use \AccelaSearch\ProductMapper\Attribute;
+
+$name = new Attribute("name");
+$name->addValue("T-Shirt");
+
+$tags = new Attribute("tag");
+$tags->addValue("fashion")->addValue("summer")->addValue("light");
+
+// $item = ...
+$item->addAttribute($name)
+    ->addAttribute($tags);
+```
+
+Once an attribute is defined for a product, it is possible to retrieve it by its name (and possibly modify its list of values):
+
+```php
+$item->getAttribute("tag")->removeValue("light")->addValue("men");
+```
+
+Attribute names should be English words, all lowercase, in singular form (when applicable) and must not contain spaces. We recommend using hyphens or underscore in place of spaces.
+
+For single-valued attribute, a shorthand is available in the form of a factory method:
+
+```php
+$item->addAttribute(Attribute::fromNameAndValue("name", "T-Shirt"));
+```
+
+For products which are part of a configurable, attributes affecting configuration must be flagged as such by setting `isConfigurable` to true:
+
+```php
+$color = new Attribute("color");
+$color->addValue("red");
+$color->setIsConfigurable(true);
+
+// $configurable_item = ...
+// $actual_item = ...
+$actual_item->addAttribute($color);
+```
+
+which is also available in the shorthand:
+
+```php
+$actual_item->addAttribute(Attribute::fromNameAndValue("color", "red")->setIsConfigurable(true));
+```
+
+### Configurable Products
+
+Configurable products are meta-products logically grouping together a set of actual (usually `Simple`) products which differ among each other by small details, such as color or size. When dealing with configurable products, a set of children products must be created and assigned to the parent configurable. Some attributes of the children should be marked as configurable in order to tell AccelaSearch which attributes makes the configuration, and which one do not (as described in previous section):
+
+```php
+use \AccelaSearch\ProductMapper\ProductFactory;
+use \AccelaSearch\ProductMapper\Attribute;
+
+$factory = new ProductFactory();
+$shirt = $factory->createConfigurable("http://www.myshop.com/shirt", "ID:42");
+$shirt->setSku("CONF-001");
+
+$blue_shirt = $factory->createSimple("http://www.myshop.com/shirt/blue", "ID:44");
+$blue_shirt->setSku("CONF-001-b");
+$blue_shirt->addAttribute(Attribute::fromNameAndValue("color", "blue")->setIsConfigurable(true));
+$blue_shirt->addAttribute(Attribute::fromNameAndValue("name", "blue shirt"));
+
+$red_shirt = $factory->createSimple("http://www.myshop.com/shirt/red", "ID:45");
+$red_shirt->setSku("CONF-001-r");
+$red_shirt->addAttribute(Attribute::fromNameAndValue("color", "red")->setIsConfigurable(true));
+$red_shirt->addAttribute(Attribute::fromNameAndValue("name", "red shirt"));
+
+$shirt->addVariant($red_shirt)->addVariant($blue_shirt);
+```
+
+Although not shown in the example, it is recommended to set pricing, availability and category information for both parent and children, as the former does not inherit them from the latter, nor vice-versa.
+
+### Bundle and Grouped Products
+
+Bundle and grouped are meta-products grouping together a set of actual (usually `Simple`) products which are sold together. When dealing with bundle or grouped products, a set of children products must be created and assigned to the parent. A product may appear more than once as child of the same parent, for instance when a set of two identical products is sold together:
+
+```php
+use \AccelaSearch\ProductMapper\ProductFactory;
+use \AccelaSearch\ProductMapper\Attribute;
+
+$factory = new ProductFactory();
+$group = $factory->createGrouped("http://www.myshop.com/group", "ID:48");
+$group->setSku("GRP-009");
+
+$bottle = $factory->createSimple("http://www.myshop.com/bottle", "ID:94");
+$bottle->setSku("BTL-001");
+
+$paper = $factory->createSimple("http://www.myshop.com/paper", "ID:105");
+$bottle->setSku("PPR-001");
+
+// Two bottles and one piece of paper
+$group->addProduct($bottle)->addProduct($bottle)->addProduct($paper);
+```
+
+Although not shown in the example, it is recommended to set pricing, availability and category information for both parent and children, as the former does not inherit them from the latter, nor vice-versa.
