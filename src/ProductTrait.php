@@ -15,7 +15,7 @@ trait ProductTrait {
         return $this->external_identifier;
     }
 
-    public function setExternalIdentifier(string $identifier): self {
+    public function setExternalIdentifier(string $identifier): ProductInterface {
         $this->external_identifier = $identifier;
         return $this;
     }
@@ -24,17 +24,17 @@ trait ProductTrait {
         return array_values($this->categories);
     }
 
-    public function addCategory(Category $category): self {
+    public function addCategory(Category $category): ProductInterface {
         $this->categories[$category->getExternalIdentifier()] = $category;
         return $this;
     }
 
-    public function removeCategory(Category $category): self {
+    public function removeCategory(Category $category): ProductInterface {
         unset($this->categories[$category->getExternalIdentifier()]);
         return $this;
     }
 
-    public function clearCategories(): self {
+    public function clearCategories(): ProductInterface {
         $this->categories = [];
         return $this;
     }
@@ -53,17 +53,17 @@ trait ProductTrait {
             : null;
     }
 
-    public function addAttribute(Attribute $attribute): self {
+    public function addAttribute(Attribute $attribute): ProductInterface {
         $this->attributes[$attribute->getName()] = $attribute;
         return $this;
     }
 
-    public function removeAttribute(Attribute $attribute): self {
+    public function removeAttribute(Attribute $attribute): ProductInterface {
         unset($this->attributes[$attribute->getName()]);
         return $this;
     }
 
-    public function clearAttributes(): self {
+    public function clearAttributes(): ProductInterface {
         $this->attributes = [];
         return $this;
     }
