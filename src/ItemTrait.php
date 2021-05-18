@@ -10,7 +10,7 @@ trait ItemTrait {
         return $this->identifier;
     }
 
-    public function setIdentifier(int $identifier): self {
+    public function setIdentifier(int $identifier): ItemInterface {
         $this->identifier = $identifier;
         return $this;
     }
@@ -19,7 +19,7 @@ trait ItemTrait {
         return $this->sku;
     }
 
-    public function setSku(string $sku): self {
+    public function setSku(string $sku): ItemInterface {
         $this->sku = $sku;
         return $this;
     }
@@ -28,7 +28,7 @@ trait ItemTrait {
         return $this->url;
     }
 
-    public function setUrl(string $url): self {
+    public function setUrl(string $url): ItemInterface {
         $this->url = $url;
         return $this;
     }

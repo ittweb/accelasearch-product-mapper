@@ -9,7 +9,7 @@ trait WarehouseTrait {
         return $this->identifier;
     }
 
-    public function setIdentifier(int $identifier): self {
+    public function setIdentifier(int $identifier): WarehouseInterface {
         $this->identifier = $identifier;
         return $this;
     }
@@ -18,7 +18,7 @@ trait WarehouseTrait {
         return $this->label;
     }
 
-    public function setLabel(string $label): self {
+    public function setLabel(string $label): WarehouseInterface {
         $this->label = $label;
         return $this;
     }
