@@ -7,5 +7,5 @@ interface ItemInterface {
     public function read(int $identifier): Subject;
     public function update(Subject $item): self;
     public function delete(Subject $item): self;
-    public function search();
+    public function search(): array;
 }

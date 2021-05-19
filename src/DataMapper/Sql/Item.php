@@ -45,7 +45,7 @@ class Item implements ItemMapperInterface {
         );
     }
 
-    public function create(ItemInterface $item): self {
+    public function create(ItemInterface $item): ItemMapperInterface {
         // Inserts base information
         $query = 'INSERT INTO products(sku, siteid, typeid, externalidstr, url) '
             . 'VALUES(:sku, :shop_identifier, :type_identifier, :external_identifier, :url) '
@@ -93,11 +93,11 @@ class Item implements ItemMapperInterface {
         return $this->item_reader->read($identifier);
     }
 
-    public function update(ItemInterface $item): self {
+    public function update(ItemInterface $item): ItemMapperInterface {
         return $this->create($item);
     }
 
-    public function delete(ItemInterface $item): self {
+    public function delete(ItemInterface $item): ItemMapperInterface {
         $sth = $this->connection->getDbh()->prepare('DELETE FROM products_attr_text WHERE productid = :identifier');
         $sth->execute([':identifier' => $item->getIdentifier()]);
         $sth = $this->connection->getDbh()->prepare('DELETE FROM products_categories WHERE productid = :identifier');
