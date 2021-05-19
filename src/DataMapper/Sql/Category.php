@@ -85,7 +85,7 @@ class Category {
         $category = new Subject(
             $row['externalidstr'],
             $row['categoryname'],
-            $row['parentid'] ? $this->read($row['parentid']) : null,
+            $row['parentid'] ? $this->read($row['parentid']) : null
         );
         $category->setIdentifier($row['id']);
         $category->setFullName($row['fullcategoryname']);
