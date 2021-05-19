@@ -1,5 +1,5 @@
 {
-    "name": "ittweb/accelasearch-product-mapper",
+    "name": "accelasearch/product-mapper",
     "description": "Allows easy integration with AccelaSearch's product managerment.",
     "type": "library",
     "authors": [{
