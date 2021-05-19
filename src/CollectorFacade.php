@@ -107,7 +107,7 @@ class CollectorFacade {
     }
 
     private function ensureGroups(SellableInterface $item): self {
-        foreach ($item->getPricing() as $price) {
+        foreach ($item->getPricing()->asArray() as $price) {
             $groups = $this->groups->search(function ($group) use ($price) {
                 return $group->getLabel() === $price->getCustomerGroup()->getLabel();
             });
