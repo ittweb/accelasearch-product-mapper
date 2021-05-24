@@ -2,6 +2,9 @@
     "name": "accelasearch/product-mapper",
     "description": "Allows easy integration with AccelaSearch's product managerment.",
     "type": "library",
+    "bin": [
+        "bin/collector.php"
+    ],
     "authors": [{
         "name": "Marco Zanella",
         "email": "mzanella@ittweb.net"
