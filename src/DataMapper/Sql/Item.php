@@ -46,6 +46,7 @@ class Item implements ItemMapperInterface {
     }
 
     public function create(ItemInterface $item): ItemMapperInterface {
+        $is_update = !is_null($item->getIdentifier());
         // Inserts base information
         $query = 'INSERT INTO products(sku, siteid, typeid, externalidstr, url) '
             . 'VALUES(:sku, :shop_identifier, :type_identifier, :external_identifier, :url) '
@@ -65,7 +66,9 @@ class Item implements ItemMapperInterface {
 
         // Inserts additional information
         if ($item->accept($this->item_is_product)) {
-            $this->clear($item);
+            if ($is_update) {
+                $this->clear($item);
+            }
             $this->insertAttributes($item);
             $this->insertCategories($item);
             $this->insertImageInfo($item);
@@ -74,9 +77,11 @@ class Item implements ItemMapperInterface {
         }
 
         // Inserts children
-        $query = 'UPDATE products_children SET deleted = 1 WHERE parentid = :parent_identifier';
-        $sth = $this->connection->getDbh()->prepare($query);
-        $sth->execute([':parent_identifier' => $item->getIdentifier()]);
+        if ($is_update) {
+            $query = 'UPDATE products_children SET deleted = 1 WHERE parentid = :parent_identifier';
+            $sth = $this->connection->getDbh()->prepare($query);
+            $sth->execute([':parent_identifier' => $item->getIdentifier()]);
+        }
         $query = 'INSERT INTO products_children(productid, parentid) VALUES(:child_identifier, :parent_identifier)';
         $sth = $this->connection->getDbh()->prepare($query);
         foreach ($item->accept($this->item_get_children) as $child) {
