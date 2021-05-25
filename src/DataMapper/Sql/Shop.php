@@ -18,7 +18,8 @@ class Shop {
 
     public function create(Subject $shop): self {
         $query = 'INSERT INTO storeviews(url, description, langiso, siteid, storeid, viewid, hash, cmsid) '
-            . 'VALUES(:url, :description, :language_iso, 1, 1, 1, :hash, :cms_identifier)';
+            . 'VALUES(:url, :description, :language_iso, 1, 1, 1, :hash, :cms_identifier) '
+            . 'ON DUPLICATE KEY UPDATE disabled = 0';
         $sth = $this->dbh->prepare($query);
         $sth->execute([
             ':url' => $shop->getUrl(),
