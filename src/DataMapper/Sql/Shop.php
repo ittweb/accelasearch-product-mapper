@@ -44,7 +44,7 @@ class Shop {
     }
 
     public function update(Subject $shop): self {
-        $query = 'UPDATE storeviews SET url = :url, description = :description, langiso = :language_iso, cmsid = :cms_identifier, disabled = :is_disabled, firstinit = :initialization_timestamp, lastsync = :last_synchronization_timestamp, lastupdate = :last_update_timestamp, deleted = 0 WHERE id = :identifier';
+        $query = 'UPDATE storeviews SET url = :url, description = :description, langiso = :language_iso, cmsid = :cms_identifier, disabled = :is_disabled, firstinit = :initialization_timestamp, lastsync = :last_synchronization_timestamp, lastupdate = :last_update_timestamp WHERE id = :identifier';
         $sth = $this->dbh->prepare($query);
         $sth->execute([
             ':identifier' => $shop->getIdentifier(),
