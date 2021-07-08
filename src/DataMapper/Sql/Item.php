@@ -1,5 +1,6 @@
 <?php
 namespace AccelaSearch\ProductMapper\DataMapper\Sql;
+use \OutOfBoundsException;
 use \AccelaSearch\ProductMapper\ItemInterface;
 use \AccelaSearch\ProductMapper\ProductInterface;
 use \AccelaSearch\ProductMapper\StockableInterface;
@@ -45,12 +46,14 @@ class Item implements ItemMapperInterface {
         );
     }
 
+    public function getConnection(): Connection {
+        return $this->connection;
+    }
+
     public function create(ItemInterface $item): ItemMapperInterface {
-        $is_update = !is_null($item->getIdentifier());
-        // Inserts base information
-        $query = 'INSERT INTO products(sku, siteid, typeid, externalidstr, url) '
-            . 'VALUES(:sku, :shop_identifier, :type_identifier, :external_identifier, :url) '
-            . 'ON DUPLICATE KEY UPDATE sku = :sku, typeid = :type_identifier, externalidstr = :external_identifier, url = :url, deleted = 0';
+        // Tries to insert base information
+        $query = 'INSERT IGNORE INTO products(sku, siteid, typeid, externalidstr, url) '
+            . 'VALUES(:sku, :shop_identifier, :type_identifier, :external_identifier, :url)';
         $sth = $this->connection->getDbh()->prepare($query);
         $sth->execute([
             ':sku' => $item->getSku(),
@@ -62,6 +65,31 @@ class Item implements ItemMapperInterface {
         $id = $this->connection->getDbh()->lastInsertId();
         if (!empty($id)) {
             $item->setIdentifier($id);
+        }
+
+        // Updates item if item already present
+        $is_update = $sth->rowCount() === 0;
+        if ($is_update) {
+            $query = 'SELECT id FROM products WHERE sitedid = :shop_identifier AND sku = :sku';
+            $sth = $this->connection->getDbh()->prepare($query);
+            $sth->execute([
+                ':shop_identifier' => $this->connection->getShopIdentifier(),
+                ':sku' => $item->getSku()
+            ]);
+            $row = $sth->fetch();
+            if (empty($row)) {
+                throw new OutOfBoundsException("Cannot update product with SKU \"" . $item->getSku() . "\".");
+            }
+            $item->setIdentifier($row['id']);
+            $query = 'UPDATE products SET typeid = :type_identifier, externalidstr = :external_identifier, url = :url, deleted = 0 '
+                . ' WHERE id = :identifier';
+            $sth = $this->connection->getDbh()->prepare($query);
+            $sth->execute([
+                ':identifier' => $item->getIdentifier(),
+                ':type_identifier' => $item->accept($this->item_get_type),
+                ':external_identifier' => $item->accept($this->item_is_product) ? $item->getExternalIdentifier() : null,
+                ':url' => $item->getUrl()
+            ]);
         }
 
         // Inserts additional information

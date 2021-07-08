@@ -83,7 +83,6 @@ class ItemReader {
     }
 
     private function rowToItem(array $row): ItemInterface {
-        $children = $this->searchChildrenByIdentifier($row['id']);
         switch ($row['typeid']) {
             case ItemGetTypeVisitor::BUNDLE:
                 $item = new Banner($row['url'], '', '');
@@ -115,6 +114,7 @@ class ItemReader {
             case ItemGetTypeVisitor::CONFIGURABLE:
                 $item = $this->product_factory->createConfigurable($row['url'], $row['externalidstr']);
                 $item->setIdentifier($row['id']);
+                $children = $this->searchChildrenByIdentifier($row['id']);
                 foreach ($children as $child) {
                     $item->addVariant($child);
                 }
@@ -123,6 +123,7 @@ class ItemReader {
             case ItemGetTypeVisitor::BUNDLE:
                 $item = $this->product_factory->createBundle($row['url'], $row['externalidstr']);
                 $item->setIdentifier($row['id']);
+                $children = $this->searchChildrenByIdentifier($row['id']);
                 foreach ($children as $child) {
                     $item->addProduct($child);
                 }
@@ -131,6 +132,7 @@ class ItemReader {
             case ItemGetTypeVisitor::GROUPED:
                 $item = $this->product_factory->createGrouped($row['url'], $row['externalidstr']);
                 $item->setIdentifier($row['id']);
+                $children = $this->searchChildrenByIdentifier($row['id']);
                 foreach ($children as $child) {
                     $item->addProduct($child);
                 }
