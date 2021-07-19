@@ -36,7 +36,7 @@ class AttributeLabel {
         return $labels;
     }
 
-    private function rowToAttributeLabels(array $row): Subject {
+    private function rowToAttributeLabel(array $row): Subject {
         return new Subject(
             $row['id'],
             $row['label'],
