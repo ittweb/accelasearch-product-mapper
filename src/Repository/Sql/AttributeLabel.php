@@ -19,7 +19,7 @@ class AttributeLabel implements AttributeLabelInterface {
     }
 
     public static function fromConnection(Connection $connection): self {
-        return new CustomerGroup(DataMapper::fromConnection($connection));
+        return new AttributeLabel(DataMapper::fromConnection($connection));
     }
     
     public function read(int $identifier): Subject {
