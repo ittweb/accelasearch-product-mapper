@@ -5,7 +5,7 @@ use \BadFunctionCallException;
 use \AccelaSearch\ProductMapper\Stock\Warehouse\WarehouseInterface as Subject;
 use \AccelaSearch\ProductMapper\Repository\WarehouseInterface;
 
-class Warehouse {
+class Warehouse implements WarehouseInterface {
     private $warehouses;
 
     public function __construct() {
