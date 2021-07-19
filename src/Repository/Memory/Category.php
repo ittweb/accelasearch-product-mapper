@@ -5,7 +5,7 @@ use \BadFunctionCallException;
 use \AccelaSearch\ProductMapper\Category as Subject;
 use \AccelaSearch\ProductMapper\Repository\CategoryInterface;
 
-class Category {
+class Category implements CategoryInterface {
     private $categories;
 
     public function __construct() {

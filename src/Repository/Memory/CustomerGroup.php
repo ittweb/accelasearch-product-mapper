@@ -5,7 +5,7 @@ use \BadFunctionCallException;
 use \AccelaSearch\ProductMapper\Price\CustomerGroup as Subject;
 use \AccelaSearch\ProductMapper\Repository\CustomerGroupInterface;
 
-class CustomerGroup {
+class CustomerGroup implements CustomerGroupInterface {
     private $groups;
 
     public function __construct() {
