@@ -81,7 +81,7 @@ class Item implements ItemMapperInterface {
             if (empty($row)) {
                 throw new OutOfBoundsException("Cannot update product with SKU \"" . $item->getSku() . "\".");
             }
-            $item = $this->item_reader->read($row['id']);
+            $item->steIdentifier($row['id']);
             $query = 'UPDATE products SET typeid = :type_identifier, externalidstr = :external_identifier, url = :url, deleted = 0 '
                 . ' WHERE id = :identifier';
             $sth = $this->connection->getDbh()->prepare($query);
