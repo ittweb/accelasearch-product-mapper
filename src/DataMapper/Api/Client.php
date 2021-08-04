@@ -46,7 +46,7 @@ class Client {
         if ($method === 'GET' || $method === 'DELETE') {
             $url .= http_build_query($request->getParametersAsArray());
         }
-        $request_headers = ['X-accelasearch-apikey:' . $this->api_key];
+        $request_headers = ['X-Accelasearch-Apikey:' . $this->api_key];
         foreach ($request->getHeadersAsArray() as $key => $value) {
             $request_headers[] = $key . ': ' . $value;
         }
@@ -73,7 +73,7 @@ class Client {
             */
         ));
         if ($method === 'POST' || $method === 'PUT') {
-            curl_setopt($curl, CURLOPT_POSTFIELDS, $request->getParamtersAsArray());
+            curl_setopt($curl, CURLOPT_POSTFIELDS, $request->getParametersAsArray());
         }
         $response = curl_exec($curl);
         curl_close($curl);
