@@ -70,17 +70,18 @@ class Item implements ItemMapperInterface {
         // Updates item if item already present
         $is_update = $sth->rowCount() === 0;
         if ($is_update) {
-            $query = 'SELECT id FROM products WHERE sitedid = :shop_identifier AND sku = :sku';
+            $query = 'SELECT id FROM products WHERE siteid = :shop_identifier AND sku = :sku OR externalidstr = :external_identifier';
             $sth = $this->connection->getDbh()->prepare($query);
             $sth->execute([
                 ':shop_identifier' => $this->connection->getShopIdentifier(),
-                ':sku' => $item->getSku()
+                ':sku' => $item->getSku(),
+                ':external_identifier' => $item->getExternalIdentifier()
             ]);
             $row = $sth->fetch();
             if (empty($row)) {
                 throw new OutOfBoundsException("Cannot update product with SKU \"" . $item->getSku() . "\".");
             }
-            $item->setIdentifier($row['id']);
+            $item = $this->item_reader($row['id']);
             $query = 'UPDATE products SET typeid = :type_identifier, externalidstr = :external_identifier, url = :url, deleted = 0 '
                 . ' WHERE id = :identifier';
             $sth = $this->connection->getDbh()->prepare($query);
