@@ -11,6 +11,7 @@ use \AccelaSearch\ProductMapper\SellableInterface;
 use \AccelaSearch\ProductMapper\ProductInterface;
 use \AccelaSearch\ProductMapper\ProductFactory;
 use \AccelaSearch\ProductMapper\Attribute;
+use \AccelaSearch\ProductMapper\Image;
 use \AccelaSearch\ProductMapper\Stock\Stock;
 use \AccelaSearch\ProductMapper\Stock\Quantity\Limited;
 use \AccelaSearch\ProductMapper\Stock\Quantity\Unlimited;
