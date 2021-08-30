@@ -205,7 +205,7 @@ class ItemReader {
         $sth = $this->connection->getDbh()->prepare($query);
         $sth->execute([':identifier' => $item->getIdentifier()]);
         while ($row = $sth->fetch()) {
-            $item->addImage(new Image($row['label'], $row['url'], $row['position']));
+            $item->addImage(new Image($row['label'], $row['url'], $row['sort']));
         }
         return $this;
     }
