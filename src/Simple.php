@@ -10,8 +10,7 @@ class Simple implements ProductInterface {
         string $url,
         string $external_identifier,
         Availability $availability,
-        Pricing $pricing,
-        ImageInfo $image_info
+        Pricing $pricing
     ) {
         $this->identifier = null;
         $this->sku = null;
@@ -20,7 +19,7 @@ class Simple implements ProductInterface {
         $this->pricing = $pricing;
         $this->external_identifier = $external_identifier;
         $this->categories = [];
-        $this->image_info = $image_info;
+        $this->images = [];
         $this->attributes = [];
     }
 

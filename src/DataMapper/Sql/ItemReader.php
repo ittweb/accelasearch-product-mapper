@@ -161,7 +161,7 @@ class ItemReader {
     private function buildProduct(ProductInterface $item): self {
         return $this->buildAttributes($item)
             ->buildCategories($item)
-            ->buildImageInfo($item)
+            ->buildImages($item)
             ->buildPricing($item)
             ->buildAvailability($item)
         ;
@@ -197,20 +197,14 @@ class ItemReader {
         return $this;
     }
 
-    private function buildImageInfo(ProductInterface $item): self {
-        $query = 'SELECT main, `over`, url FROM products_images WHERE productid = :identifier AND deleted = 0';
+    private function buildImages(ProductInterface $item): self {
+        $query = 'SELECT label, sort, url FROM products_images JOIN products_images_lbl '
+            . 'ON products_images.labelid = products_images_lbl.id '
+            . 'WHERE productid = :identifier AND products_images.deleted = 0 AND products_images_lbl.deleted = 0';
         $sth = $this->connection->getDbh()->prepare($query);
         $sth->execute([':identifier' => $item->getIdentifier()]);
         while ($row = $sth->fetch()) {
-            if ($row['main'] == 1) {
-                $item->getImageInfo()->setMain($row['url']);
-            }
-            elseif ($row['over'] == 1) {
-                $item->getImageInfo()->setOver($row['url']);
-            }
-            else {
-                $item->getImageInfo()->addOther($row['url']);
-            }
+            $item->addImage(new Image($row['label'], $row['url'], $row['position']));
         }
         return $this;
     }

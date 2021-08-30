@@ -196,27 +196,23 @@ Categories are not explicitly handled by the `CollectorFacade`, which will trans
 
 ### Adding Image Information
 
-Information about pictures of a product are handled by the `ImageInfo` class, which allows to specify a primary (main) image, a secondary (over) image an a list of other images:
+Information about pictures of a product are handled by the `Image` class which allows to specify, for each image, a label, an URL and a position:
 
 ```php
-use \AccelaSearch\ProductMapper\ImageInfo;
+use \AccelaSearch\ProductMapper\Image;
 
-$image_info = new ImageInfo();
-$image_info->setMain("http://www.myshop.com/storage/images/001.jpeg")
-    ->setOver("http://www.myshop.com/storage/secondary/001a.jpeg")
-    ->addOther("http://www.myshop.com/storage/secondary/001b.jpeg")
-    ->addOther("http://www.myshop.com/storage/secondary/001c.jpeg")
-    ->addOther("http://www.myshop.com/storage/secondary/001e.jpeg");
+$image_1 = new Image("main", "http://www.myshop.com/storage/images/001.jpeg", 1);
+$image_2 = new Image("over", "http://www.myshop.com/storage/images/002.jpeg", 3);
 ```
 
-When creating products through the `ProductFactory`, an empty `ImageInfo` is automatically instantiated upon creation, and may be accessed through its accessors methods:
+Images can be added to items through the `addImage` method:
 
 ```php
 use \AccelaSearch\ProductMapper\ProductFactory;
 
 $factory = new ProductFactory();
 $item = $factory->createSimple("http://myshop.com/SIMPLE0001", "SIMPLE0001");
-$item->getImageInfo()->setMain("http://myshop.com/storage/images/simple0001.jpeg");
+$item->addImage($image_1)->addImage($image_2);
 ```
 
 ### Adding Availability
