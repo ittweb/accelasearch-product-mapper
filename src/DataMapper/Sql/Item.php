@@ -5,7 +5,7 @@ use \AccelaSearch\ProductMapper\ItemInterface;
 use \AccelaSearch\ProductMapper\ProductInterface;
 use \AccelaSearch\ProductMapper\StockableInterface;
 use \AccelaSearch\ProductMapper\SellableInterface;
-use \AccelaSearch\ProductMapper\ImageLabel;
+use \AccelaSearch\ProductMapper\ImageLabel as ImageLabelSubject;
 use \AccelaSearch\ProductMapper\DataMapper\ItemInterface as ItemMapperInterface;
 
 class Item implements ItemMapperInterface {
@@ -268,7 +268,7 @@ class Item implements ItemMapperInterface {
         };
         foreach ($item->getImagesAsArray() as $image) {
             if (!isset($this->image_label_lookup[$image->getLabel()])) {
-                $image_label = new ImageLabel(null, $image->getLabel(), true);
+                $image_label = new ImageLabelSubject(null, $image->getLabel(), true);
                 $this->image_label_mapper->create($image_label);
                 $this->image_label_lookup[$image->getLabel()] = $image_label->getIdentifier();
             }
