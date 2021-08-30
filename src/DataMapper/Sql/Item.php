@@ -45,6 +45,7 @@ class Item implements ItemMapperInterface {
     public static function fromConnection(Connection $connection): self {
         return new Item(
             $connection,
+            ImageLabel::fromConnection($connection),
             ItemReader::fromConnection($connection),
             new ItemGetTypeVisitor(),
             new ItemIsProductVisitor(),
