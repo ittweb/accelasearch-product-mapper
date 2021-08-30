@@ -40,7 +40,7 @@ trait ProductTrait {
     }
 
     public function getImagesAsArray(): array {
-        return $this->images;
+        return array_values($this->images);
     }
 
     public function getImage(string $label): ?Image {
