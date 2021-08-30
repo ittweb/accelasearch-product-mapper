@@ -5,11 +5,14 @@ use \AccelaSearch\ProductMapper\ItemInterface;
 use \AccelaSearch\ProductMapper\ProductInterface;
 use \AccelaSearch\ProductMapper\StockableInterface;
 use \AccelaSearch\ProductMapper\SellableInterface;
+use \AccelaSearch\ProductMapper\ImageLabel;
 use \AccelaSearch\ProductMapper\DataMapper\ItemInterface as ItemMapperInterface;
 
 class Item implements ItemMapperInterface {
     private $connection;
     private $attribute_lookup;
+    private $image_label_lookup;
+    private $image_label_mapper;
     private $item_reader;
     private $item_get_type;
     private $item_is_product;
@@ -18,6 +21,7 @@ class Item implements ItemMapperInterface {
 
     public function __construct(
         Connection $connection,
+        ImageLabel $image_label_mapper,
         ItemReader $item_reader,
         ItemGetTypeVisitor $item_get_type,
         ItemIsProductVisitor $item_is_product,
@@ -25,14 +29,17 @@ class Item implements ItemMapperInterface {
         QuantityConverterVisitor $quantity_converter
     ) {
         $this->connection = $connection;
+        $this->attribute_lookup = [];
+        $this->image_label_lookup = [];
+        $this->image_label_mapper = $image_label_mapper;
         $this->item_reader = $item_reader;
         $this->item_get_type = $item_get_type;
         $this->item_is_product = $item_is_product;
-        $this->attribute_lookup = [];
         $this->item_get_children = $item_get_children;
         $this->quantity_converter = $quantity_converter;
 
         $this->initializeAttributeLookup();
+        $this->initializeImageLabelLookup();
     }
 
     public static function fromConnection(Connection $connection): self {
@@ -100,7 +107,7 @@ class Item implements ItemMapperInterface {
             }
             $this->insertAttributes($item);
             $this->insertCategories($item);
-            $this->insertImageInfo($item);
+            $this->insertImages($item);
             $this->insertAvailability($item);
             $this->insertPricing($item);
         }
@@ -176,6 +183,13 @@ class Item implements ItemMapperInterface {
         return $this;
     }
 
+    private function initializeImageLabelLookup(): self {
+        foreach ($this->image_label_mapper->search() as $image_label) {
+            $this->image_label_lookup[$image_label->getLabel()] = $image_label->getIdentifier();
+        }
+        return $this;
+    }
+
     private function insertAttributes(ProductInterface $item): self {
         $clauses = [];
         $binders = [];
@@ -234,34 +248,33 @@ class Item implements ItemMapperInterface {
         return $this;
     }
 
-    private function insertImageInfo(ProductInterface $item): self {
+    private function insertImages(ProductInterface $item): self {
         $clauses = [];
         $binders = [];
-        $push = function (string $url, bool $is_main, bool $is_over) use($item, &$clauses, &$binders) {
+        $push = function (string $url, int $label_identifier, int $position) use($item, &$clauses, &$binders) {
             $progressive_identifier = count($clauses) + 1;
             $clauses[] = '(:product_identifier_' . $progressive_identifier
                 . ', :product_external_identifier_' . $progressive_identifier
-                . ', :is_main_' . $progressive_identifier
-                . ', :is_over_' . $progressive_identifier
+                . ', :label_identifier_' . $progressive_identifier
+                . ', :sort_' . $progressive_identifier
                 . ', :url_' . $progressive_identifier . ')'
             ;
             $binders[':product_identifier_' . $progressive_identifier] = $item->getIdentifier();
             $binders[':product_external_identifier_' . $progressive_identifier] = $item->getExternalIdentifier();
-            $binders[':is_main_' . $progressive_identifier] = $is_main ? 1 : 0;
-            $binders[':is_over_' . $progressive_identifier] = $is_over ? 1 : 0;
+            $binders[':label_identifier_' . $progressive_identifier] = $label_identifier;
+            $binders[':sort_' . $progressive_identifier] = $position;
             $binders[':url_' . $progressive_identifier] = $url;
         };
-        if (!is_null($item->getImageInfo()->getMain())) {
-            $push($item->getImageInfo()->getMain(), true, false);
-        }
-        if (!is_null($item->getImageInfo()->getOver())) {
-            $push($item->getImageInfo()->getOver(), false, true);
-        }
-        foreach ($item->getImageInfo()->getOtherAsArray() as $other) {
-            $push($other, false, false);
+        foreach ($item->getImagesAsArray() as $image) {
+            if (!isset($this->image_label_lookup[$image->getLabel()])) {
+                $image_label = new ImageLabel(null, $image->getLabel(), true);
+                $this->image_label_mapper->create($image_label);
+                $this->image_label_lookup[$image->getLabel()] = $image_label->getIdentifier();
+            }
+            $push($image->getUrl(), $this->image_label_lookup[$image->getLabel()], $image->getPosition());
         }
         if (!empty($clauses)) {
-            $query = 'INSERT INTO products_images(productid, externalproductidstr, main, `over`, url) VALUES '
+            $query = 'INSERT INTO products_images(productid, externalproductidstr, labelid, sort, url) VALUES '
                 . implode(', ', $clauses);
             $sth = $this->connection->getDbh()->prepare($query);
             $sth->execute($binders);

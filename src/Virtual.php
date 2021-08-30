@@ -8,10 +8,9 @@ class Virtual extends Simple {
         string $url,
         string $external_identifier,
         Availability $availability,
-        Pricing $pricing,
-        ImageInfo $image_info
+        Pricing $pricing
     ) {
-        parent::__construct($url, $external_identifier, $availability, $pricing, $image_info);
+        parent::__construct($url, $external_identifier, $availability, $pricing);
     }
 
     public function accept(VisitorInterface $visitor) {

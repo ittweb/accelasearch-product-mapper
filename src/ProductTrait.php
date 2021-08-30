@@ -8,7 +8,7 @@ trait ProductTrait {
 
     private $external_identifier;
     private $categories;
-    private $image_info;
+    private $images;
     private $attributes;
 
     public function getExternalIdentifier(): string {
@@ -39,8 +39,29 @@ trait ProductTrait {
         return $this;
     }
 
-    public function getImageInfo(): ImageInfo {
-        return $this->image_info;
+    public function getImagesAsArray(): array {
+        return $this->images;
+    }
+
+    public function getImage(string $label): ?Image {
+        return isset($this->images[$label])
+            ? $this->images[$label]
+            : null;
+    }
+
+    public function addImage(Image $image): ProductInterface {
+        $this->images[$image->getLabel()] = $image;
+        return $this;
+    }
+
+    public function removeImage(Image $image): ProductInterface {
+        unset($this->images[$image->getLabel()]);
+        return $this;
+    }
+
+    public function clearImages(): ProductInterface {
+        $this->images = [];
+        return $this;
     }
 
     public function getAttributesAsArray(): array {

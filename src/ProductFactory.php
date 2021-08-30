@@ -8,41 +8,41 @@ class ProductFactory {
         string $url,
         string $external_identifier
     ): Simple {
-        return new Simple($url, $external_identifier, new Availability(), new Pricing(), new ImageInfo());
+        return new Simple($url, $external_identifier, new Availability(), new Pricing());
     }
 
     public function createVirtual(
         string $url,
         string $external_identifier
     ): Virtual {
-        return new Virtual($url, $external_identifier, new Availability(), new Pricing(), new ImageInfo());
+        return new Virtual($url, $external_identifier, new Availability(), new Pricing());
     }
 
     public function createDownloadable(
         string $url,
         string $external_identifier
     ): Downloadable {
-        return new Downloadable($url, $external_identifier, new Availability(), new Pricing(), new ImageInfo());
+        return new Downloadable($url, $external_identifier, new Availability(), new Pricing());
     }
 
     public function createConfigurable(
         string $url,
         string $external_identifier
     ): Configurable {
-        return new Configurable($url, $external_identifier, new Availability(), new Pricing(), new ImageInfo());
+        return new Configurable($url, $external_identifier, new Availability(), new Pricing());
     }
 
     public function createBundle(
         string $url,
         string $external_identifier
     ): Bundle {
-        return new Bundle($url, $external_identifier, new Availability(), new Pricing(), new ImageInfo());
+        return new Bundle($url, $external_identifier, new Availability(), new Pricing());
     }
 
     public function createGrouped(
         string $url,
         string $external_identifier
     ): Grouped {
-        return new Grouped($url, $external_identifier, new Availability(), new Pricing(), new ImageInfo());
+        return new Grouped($url, $external_identifier, new Availability(), new Pricing());
     }
 }

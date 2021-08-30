@@ -3,7 +3,7 @@ use PHPUnit\Framework\TestCase;
 use \AccelaSearch\ProductMapper\Simple;
 use \AccelaSearch\ProductMapper\Stock\Availability;
 use \AccelaSearch\ProductMapper\Price\Pricing;
-use \AccelaSearch\ProductMapper\ImageInfo;
+use \AccelaSearch\ProductMapper\Image;
 
 final class SimpleTest extends TestCase {
     public function testDefaultIsActive() {
@@ -12,6 +12,6 @@ final class SimpleTest extends TestCase {
     }
 
     private function create(): Simple {
-        return new Simple('url', 'id', new Availability(), new Pricing(), new ImageInfo());
+        return new Simple('url', 'id', new Availability(), new Pricing());
     }
 }

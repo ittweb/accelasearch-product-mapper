@@ -113,11 +113,15 @@ class visitor implements VisitorInterface {
                 'sku' => $item->getSku(),
                 'url' => $item->getUrl()
             ],
-            'image' => [
-                'main' => $item->getImageInfo()->getMain(),
-                'over' => $item->getImageInfo()->getMain(),
-                'other' => $item->getOtherAsArray()
-            ],
+            'image' => array_map(function ($image) {
+                    return [
+                        'label' => $image->getLabel(),
+                        'url' => $image->getUrl(),
+                        'position' => $image->getPosition()
+                    ];
+                },
+                $item->getImagesAsArray()
+            ),
             'categories' => $this->categories($item->getCategoriesAsArray()),
             'data' => $this->attributes($item->getAttributesAsArray()),
             'availability' => $this->availability($item->getAvailability()),
